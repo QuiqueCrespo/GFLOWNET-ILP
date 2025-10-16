@@ -1,0 +1,252 @@
+================================================================================
+PAPER-BASED IMPROVEMENTS COMPARISON
+================================================================================
+
+================================================================================
+EXPERIMENT: All Combined
+================================================================================
+Detailed Balance: True
+Replay Buffer: True
+Reward Weighted: True
+No-Decay Exploration: True
+Episode   0: reward=0.9750, length=5, loss=10.8212
+Episode  50: reward=0.6000, length=6, loss=4.7557
+Episode 100: reward=0.1000, length=1, loss=12.8369
+Episode 150: reward=0.3000, length=3, loss=3.7356
+Episode 200: reward=0.8000, length=8, loss=20.4675
+Episode 250: reward=0.3000, length=3, loss=3.8554
+Episode 300: reward=0.4000, length=4, loss=13.4551
+Episode 350: reward=0.7000, length=7, loss=13.5421
+Episode 400: reward=0.7000, length=7, loss=12.7365
+Episode 450: reward=0.4000, length=4, loss=9.4332
+Episode 500: reward=0.4000, length=4, loss=13.2210
+Episode 550: reward=0.4000, length=4, loss=3.4504
+Episode 600: reward=0.3000, length=3, loss=13.9106
+Episode 650: reward=0.6000, length=6, loss=8.7683
+Episode 700: reward=0.5000, length=5, loss=7.6800
+Episode 750: reward=0.8750, length=4, loss=12.4148
+Episode 800: reward=0.4000, length=4, loss=3.4831
+Episode 850: reward=0.4000, length=4, loss=3.5998
+Episode 900: reward=0.6000, length=6, loss=5.0419
+Episode 950: reward=0.3000, length=3, loss=8.4607
+Episode 1000: reward=0.7000, length=7, loss=23.7623
+Episode 1050: reward=0.7000, length=7, loss=9.7373
+Episode 1100: reward=0.5000, length=5, loss=5.9832
+Episode 1150: reward=0.5000, length=5, loss=14.4558
+Episode 1200: reward=0.3000, length=3, loss=8.8630
+Episode 1250: reward=0.8000, length=8, loss=11.6209
+Episode 1300: reward=0.4000, length=4, loss=3.4608
+Episode 1350: reward=0.6000, length=6, loss=9.7093
+Episode 1400: reward=0.6000, length=6, loss=9.8421
+Episode 1450: reward=0.5000, length=5, loss=4.3932
+Episode 1500: reward=0.5000, length=5, loss=12.0859
+Episode 1550: reward=0.3000, length=3, loss=3.4403
+Episode 1600: reward=0.3000, length=3, loss=12.6483
+Episode 1650: reward=0.5000, length=5, loss=4.5460
+Episode 1700: reward=0.7000, length=7, loss=9.5829
+Episode 1750: reward=0.6375, length=5, loss=6.1415
+Episode 1800: reward=0.4000, length=4, loss=3.4842
+Episode 1850: reward=0.6000, length=6, loss=8.5998
+Episode 1900: reward=0.7000, length=7, loss=16.3253
+Episode 1950: reward=0.8000, length=8, loss=6.8864
+Episode 2000: reward=0.7000, length=7, loss=7.6835
+Episode 2050: reward=0.8750, length=4, loss=4.5850
+Episode 2100: reward=0.8000, length=8, loss=8.7794
+Episode 2150: reward=0.4000, length=4, loss=3.6574
+Episode 2200: reward=0.7000, length=7, loss=5.1885
+Episode 2250: reward=0.8000, length=8, loss=5.0267
+Episode 2300: reward=0.5000, length=5, loss=10.2700
+Episode 2350: reward=0.3000, length=3, loss=4.1185
+Episode 2400: reward=0.8750, length=4, loss=11.0021
+Episode 2450: reward=0.4250, length=4, loss=3.9390
+Episode 2500: reward=0.5000, length=5, loss=3.9772
+Episode 2550: reward=0.5000, length=5, loss=10.6945
+Episode 2600: reward=0.4000, length=4, loss=3.7240
+Episode 2650: reward=0.7000, length=7, loss=9.2173
+Episode 2700: reward=0.1000, length=1, loss=10.6573
+Episode 2750: reward=0.6000, length=6, loss=13.3702
+Episode 2800: reward=0.7000, length=7, loss=10.8195
+Episode 2850: reward=0.8000, length=8, loss=4.9841
+Episode 2900: reward=0.7000, length=7, loss=7.7131
+Episode 2950: reward=0.7000, length=7, loss=5.0215
+Episode 3000: reward=0.4000, length=4, loss=3.7842
+Episode 3050: reward=0.8000, length=8, loss=4.9411
+Episode 3100: reward=0.7000, length=7, loss=6.8850
+Episode 3150: reward=0.7000, length=7, loss=5.7649
+Episode 3200: reward=0.3000, length=3, loss=4.6418
+Episode 3250: reward=0.3000, length=3, loss=12.5146
+Episode 3300: reward=0.7000, length=7, loss=15.2621
+Episode 3350: reward=0.8000, length=8, loss=5.0510
+Episode 3400: reward=0.7000, length=7, loss=4.5606
+Episode 3450: reward=0.8000, length=8, loss=4.5815
+Episode 3500: reward=0.7000, length=7, loss=13.4793
+Episode 3550: reward=0.8000, length=8, loss=9.1265
+Episode 3600: reward=0.7000, length=7, loss=5.6351
+Episode 3650: reward=0.7000, length=7, loss=13.4505
+Episode 3700: reward=0.5000, length=5, loss=4.0649
+Episode 3750: reward=0.5000, length=5, loss=10.7007
+Episode 3800: reward=0.5250, length=5, loss=5.0597
+Episode 3850: reward=0.8000, length=8, loss=6.1840
+Episode 3900: reward=0.6000, length=6, loss=12.0230
+Episode 3950: reward=0.3000, length=3, loss=5.2398
+Episode 4000: reward=0.4000, length=4, loss=13.4714
+Episode 4050: reward=0.7000, length=7, loss=6.1410
+Episode 4100: reward=0.9750, length=5, loss=6.4703
+Episode 4150: reward=0.7000, length=7, loss=7.6692
+Episode 4200: reward=0.8000, length=8, loss=7.5605
+Episode 4250: reward=0.6000, length=6, loss=12.9741
+Episode 4300: reward=0.7000, length=7, loss=13.5439
+Episode 4350: reward=0.7000, length=7, loss=13.5559
+Episode 4400: reward=0.6000, length=6, loss=11.5986
+Episode 4450: reward=0.5000, length=5, loss=4.3026
+Episode 4500: reward=0.4000, length=4, loss=4.1700
+Episode 4550: reward=0.7000, length=7, loss=10.8226
+Episode 4600: reward=0.8000, length=8, loss=6.3289
+Episode 4650: reward=0.7000, length=7, loss=5.8711
+Episode 4700: reward=0.4000, length=4, loss=13.9902
+Episode 4750: reward=0.7000, length=7, loss=12.3194
+Episode 4800: reward=0.7000, length=7, loss=11.5384
+Episode 4850: reward=0.7000, length=7, loss=6.6066
+Episode 4900: reward=0.8000, length=8, loss=6.5799
+Episode 4950: reward=0.4000, length=4, loss=3.4578
+Episode 5000: reward=0.8000, length=8, loss=14.1619
+Episode 5050: reward=0.8000, length=8, loss=14.5834
+Episode 5100: reward=0.7000, length=7, loss=11.5592
+Episode 5150: reward=0.8000, length=8, loss=5.3511
+Episode 5200: reward=0.8000, length=8, loss=10.1521
+Episode 5250: reward=0.8000, length=8, loss=6.0808
+Episode 5300: reward=0.8000, length=8, loss=5.9655
+Episode 5350: reward=0.6000, length=6, loss=6.0778
+Episode 5400: reward=0.8000, length=8, loss=5.4563
+Episode 5450: reward=0.6375, length=5, loss=4.5102
+Episode 5500: reward=0.7000, length=7, loss=5.9807
+Episode 5550: reward=0.8000, length=8, loss=11.6520
+Episode 5600: reward=0.7000, length=7, loss=12.7266
+Episode 5650: reward=0.8000, length=8, loss=5.6799
+Episode 5700: reward=0.6000, length=6, loss=7.5891
+Episode 5750: reward=0.8000, length=8, loss=5.9950
+Episode 5800: reward=0.7000, length=7, loss=10.9662
+Episode 5850: reward=0.8000, length=8, loss=9.8944
+Episode 5900: reward=0.5250, length=5, loss=4.4278
+Episode 5950: reward=0.7000, length=7, loss=5.8736
+Episode 6000: reward=0.8000, length=8, loss=5.5616
+Episode 6050: reward=0.5000, length=5, loss=3.8479
+Episode 6100: reward=0.7000, length=7, loss=16.6086
+Episode 6150: reward=0.7000, length=7, loss=5.3403
+Episode 6200: reward=0.7000, length=7, loss=5.9136
+Episode 6250: reward=0.8000, length=8, loss=5.8222
+Episode 6300: reward=0.8000, length=8, loss=5.8528
+Episode 6350: reward=0.7000, length=7, loss=10.4211
+Episode 6400: reward=0.3000, length=3, loss=4.9180
+Episode 6450: reward=0.8000, length=8, loss=10.4800
+Episode 6500: reward=0.8000, length=8, loss=5.3583
+Episode 6550: reward=0.1000, length=1, loss=17.9556
+Episode 6600: reward=0.8000, length=8, loss=4.4925
+Episode 6650: reward=0.4000, length=4, loss=10.0056
+Episode 6700: reward=0.8000, length=8, loss=10.7339
+Episode 6750: reward=0.8000, length=8, loss=9.6230
+Episode 6800: reward=0.7000, length=7, loss=5.1044
+Episode 6850: reward=0.7000, length=7, loss=10.4621
+Episode 6900: reward=0.7000, length=7, loss=4.4385
+Episode 6950: reward=0.8000, length=8, loss=5.2252
+Episode 7000: reward=0.7000, length=7, loss=10.2953
+Episode 7050: reward=0.7000, length=7, loss=5.0347
+Episode 7100: reward=0.7000, length=7, loss=5.4580
+Episode 7150: reward=0.8000, length=8, loss=5.6448
+Episode 7200: reward=0.8000, length=8, loss=5.6491
+Episode 7250: reward=0.5000, length=5, loss=9.9820
+Episode 7300: reward=0.6000, length=6, loss=9.7505
+Episode 7350: reward=0.6000, length=6, loss=5.5485
+Episode 7400: reward=0.8000, length=8, loss=5.4121
+Episode 7450: reward=0.7000, length=7, loss=5.0747
+Episode 7500: reward=0.8000, length=8, loss=10.0211
+Episode 7550: reward=0.8000, length=8, loss=9.3829
+Episode 7600: reward=0.8000, length=8, loss=9.7528
+Episode 7650: reward=0.4000, length=4, loss=5.7265
+Episode 7700: reward=0.6000, length=6, loss=9.3665
+Episode 7750: reward=0.4000, length=4, loss=8.9863
+Episode 7800: reward=0.7000, length=7, loss=9.8090
+Episode 7850: reward=0.7000, length=7, loss=5.2894
+Episode 7900: reward=0.8000, length=8, loss=4.9110
+Episode 7950: reward=0.7000, length=7, loss=4.9363
+Episode 8000: reward=0.8000, length=8, loss=5.2356
+Episode 8050: reward=0.7000, length=7, loss=4.8014
+Episode 8100: reward=0.8000, length=8, loss=4.9316
+Episode 8150: reward=0.7000, length=7, loss=4.9925
+Episode 8200: reward=0.7000, length=7, loss=10.6691
+Episode 8250: reward=0.8000, length=8, loss=10.4193
+Episode 8300: reward=0.7000, length=7, loss=4.5054
+Episode 8350: reward=0.7000, length=7, loss=4.7815
+Episode 8400: reward=0.8000, length=8, loss=4.8116
+Episode 8450: reward=0.8000, length=8, loss=4.8877
+Episode 8500: reward=0.7000, length=7, loss=4.8476
+Episode 8550: reward=0.7000, length=7, loss=4.8368
+Episode 8600: reward=0.6000, length=6, loss=5.1847
+Episode 8650: reward=0.8000, length=8, loss=4.7781
+Episode 8700: reward=0.5000, length=5, loss=3.8511
+Episode 8750: reward=0.4000, length=4, loss=4.3489
+Episode 8800: reward=0.8000, length=8, loss=4.8254
+Episode 8850: reward=0.7000, length=7, loss=4.8093
+Episode 8900: reward=0.8000, length=8, loss=4.7470
+Episode 8950: reward=0.7000, length=7, loss=4.7376
+Episode 9000: reward=0.6000, length=6, loss=4.5042
+Episode 9050: reward=0.5000, length=5, loss=4.1580
+Episode 9100: reward=0.7000, length=7, loss=9.2380
+Episode 9150: reward=0.7000, length=7, loss=9.1024
+Episode 9200: reward=0.7000, length=7, loss=4.6599
+Episode 9250: reward=0.8000, length=8, loss=4.9222
+Episode 9300: reward=0.7000, length=7, loss=9.1069
+Episode 9350: reward=0.7000, length=7, loss=4.6870
+Episode 9400: reward=0.7000, length=7, loss=4.5109
+Episode 9450: reward=0.6000, length=6, loss=9.1164
+Episode 9500: reward=0.7000, length=7, loss=4.6473
+Episode 9550: reward=0.6000, length=6, loss=8.9558
+Episode 9600: reward=0.8000, length=8, loss=4.8337
+Episode 9650: reward=0.7000, length=7, loss=8.8995
+Episode 9700: reward=0.7000, length=7, loss=4.3820
+Episode 9750: reward=0.8000, length=8, loss=4.7052
+Episode 9800: reward=0.6000, length=6, loss=4.5756
+Episode 9850: reward=0.7000, length=7, loss=4.5136
+Episode 9900: reward=0.8000, length=8, loss=4.8968
+Episode 9950: reward=0.6000, length=6, loss=4.3681
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Avg reward (first 100): 0.3753
+  Avg reward (last 100):  0.7178
+  Max reward: 1.5250
+  Avg length (last 100): 7.03
+  High-reward episodes (>0.5): 8408
+    First 100: 29
+    100-200: 42
+    200-500: 165
+  Replay buffer used: 2934 times
+  Did NOT converge to 1-step! ✓✓✓
+
+Sampling final theories...
+Final sampled theories (unique):
+  [0.9750] grandparent(X0, X5) :- parent(X0, X3), parent(X4, X5), parent(X6, X7).
+  [0.8000] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0), parent(X6, X7).
+  [0.8000] grandparent(X1, X1) :- parent(X1, X1), parent(X1, X1), parent(X6, X7).
+  [0.7000] grandparent(X0, X0) :- parent(X0, X0), parent(X4, X0), parent(X6, X7).
+  [0.7000] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+
+================================================================================
+FINAL COMPARISON
+================================================================================
+
+Strategy                         Avg(100)        Max  HighR   Conv    Len H100-200
+--------------------------------------------------------------------------------
+All Combined                       0.7178     1.5250   8408   None   7.03       42
+
+✓ Results saved to /Users/jq23948/GFLowNet-ILP/analysis/paper_improvements_results.json
+
+================================================================================
+WINNER: All Combined
+  Average reward (last 100): 0.7178
+  Max reward: 1.5250
+  High-reward episodes: 8408
+    Episodes 100-200: 42
+    Episodes 200-500: 165
+  Did NOT converge (maintained exploration!) ✓✓✓
+================================================================================

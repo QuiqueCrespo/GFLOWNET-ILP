@@ -1,0 +1,170 @@
+================================================================================
+FLOW ASSIGNMENT STRATEGY COMPARISON
+================================================================================
+
+================================================================================
+EXPERIMENT: Baseline (Standard TB)
+================================================================================
+Reward weighted: False
+Reward scale alpha: 1.0
+Episode   0: reward=0.3000, length=3, loss=40.1085
+Episode  50: reward=0.1951, length=1, loss=11.5032
+Episode 100: reward=0.6667, length=7, loss=37.0885
+Episode 150: reward=0.1861, length=1, loss=14.7885
+Episode 200: reward=0.1819, length=1, loss=14.9219
+Episode 250: reward=0.1779, length=1, loss=15.0735
+Episode 300: reward=0.1741, length=1, loss=15.0485
+Episode 350: reward=0.1705, length=1, loss=14.8672
+Episode 400: reward=0.1670, length=1, loss=14.7189
+Episode 450: reward=0.1637, length=1, loss=14.5232
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Avg reward (first 100): 0.3746
+  Avg reward (last 100):  0.1652
+  Max reward: 0.8468
+  Avg length (last 100): 1.03
+  High-reward episodes (>0.5): 35
+  Converged to 1-step at episode: 250
+
+Sampling final theories...
+Final sampled theories (unique):
+  [0.1606] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Reward Weighted
+================================================================================
+Reward weighted: True
+Reward scale alpha: 1.0
+Episode   0: reward=0.5250, length=5, loss=54.7504
+Episode  50: reward=0.2854, length=3, loss=29.7383
+Episode 100: reward=0.1905, length=1, loss=7.1155
+Episode 150: reward=0.7135, length=8, loss=59.2475
+Episode 200: reward=0.1819, length=1, loss=9.9002
+Episode 250: reward=0.1779, length=1, loss=9.8108
+Episode 300: reward=0.1741, length=1, loss=9.6632
+Episode 350: reward=0.1705, length=1, loss=9.5728
+Episode 400: reward=0.1670, length=1, loss=9.4529
+Episode 450: reward=0.1637, length=1, loss=9.3078
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Avg reward (first 100): 0.4248
+  Avg reward (last 100):  0.1651
+  Max reward: 0.9583
+  Avg length (last 100): 1.03
+  High-reward episodes (>0.5): 53
+  Converged to 1-step at episode: 181
+
+Sampling final theories...
+Final sampled theories (unique):
+  [0.1606] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Reward Scaling (α=2.0)
+================================================================================
+Reward weighted: False
+Reward scale alpha: 2.0
+Episode   0: reward=0.2000, length=1, loss=24.5278
+Episode  50: reward=0.1951, length=1, loss=26.1436
+Episode 100: reward=0.4774, length=5, loss=16.0016
+Episode 150: reward=0.6275, length=7, loss=107.3981
+Episode 200: reward=0.1819, length=1, loss=31.3919
+Episode 250: reward=0.1779, length=1, loss=31.4692
+Episode 300: reward=0.1741, length=1, loss=31.4854
+Episode 350: reward=0.1705, length=1, loss=31.4361
+Episode 400: reward=0.1670, length=1, loss=31.3651
+Episode 450: reward=0.1637, length=1, loss=31.2767
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Avg reward (first 100): 0.4149
+  Avg reward (last 100):  0.1638
+  Max reward: 1.4889
+  Avg length (last 100): 1.00
+  High-reward episodes (>0.5): 44
+  Converged to 1-step at episode: 184
+
+Sampling final theories...
+Final sampled theories (unique):
+  [0.1606] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Reward Scaling (α=3.0)
+================================================================================
+Reward weighted: False
+Reward scale alpha: 3.0
+Episode   0: reward=0.3000, length=3, loss=76.4598
+Episode  50: reward=0.4055, length=4, loss=54.5719
+Episode 100: reward=0.1905, length=1, loss=47.1370
+Episode 150: reward=0.1861, length=1, loss=51.4210
+Episode 200: reward=0.1819, length=1, loss=53.4065
+Episode 250: reward=0.1779, length=1, loss=53.6242
+Episode 300: reward=0.1741, length=1, loss=53.9394
+Episode 350: reward=0.1705, length=1, loss=54.0891
+Episode 400: reward=0.1670, length=1, loss=54.3065
+Episode 450: reward=0.1637, length=1, loss=54.4268
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Avg reward (first 100): 0.3970
+  Avg reward (last 100):  0.1638
+  Max reward: 0.9651
+  Avg length (last 100): 1.00
+  High-reward episodes (>0.5): 43
+  Converged to 1-step at episode: 170
+
+Sampling final theories...
+Final sampled theories (unique):
+  [0.1606] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Weighted + Scaling (α=2.0)
+================================================================================
+Reward weighted: True
+Reward scale alpha: 2.0
+Episode   0: reward=0.3000, length=3, loss=43.1120
+Episode  50: reward=0.1951, length=1, loss=16.2608
+Episode 100: reward=0.6667, length=7, loss=18.0278
+Episode 150: reward=0.1861, length=1, loss=18.6946
+Episode 200: reward=0.1819, length=1, loss=20.0951
+Episode 250: reward=0.1779, length=1, loss=20.2144
+Episode 300: reward=0.1741, length=1, loss=20.1236
+Episode 350: reward=0.1705, length=1, loss=19.9893
+Episode 400: reward=0.1670, length=1, loss=19.8354
+Episode 450: reward=0.1637, length=1, loss=19.6709
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Avg reward (first 100): 0.3992
+  Avg reward (last 100):  0.1638
+  Max reward: 0.8536
+  Avg length (last 100): 1.00
+  High-reward episodes (>0.5): 49
+  Converged to 1-step at episode: 216
+
+Sampling final theories...
+Final sampled theories (unique):
+  [0.1606] grandparent(X0, X0).
+
+================================================================================
+FINAL COMPARISON
+================================================================================
+
+Strategy                              Avg(100)        Max  HighR   Conv    Len
+--------------------------------------------------------------------------------
+Baseline (Standard TB)                  0.1652     0.8468     35    250   1.03
+Reward Weighted                         0.1651     0.9583     53    181   1.03
+Reward Scaling (α=2.0)                  0.1638     1.4889     44    184   1.00
+Reward Scaling (α=3.0)                  0.1638     0.9651     43    170   1.00
+Weighted + Scaling (α=2.0)              0.1638     0.8536     49    216   1.00
+
+✓ Results saved to /Users/jq23948/GFLowNet-ILP/analysis/flow_assignment_results.json
+
+================================================================================
+WINNER: Baseline (Standard TB)
+  Average reward (last 100): 0.1652
+  Max reward: 0.8468
+  High-reward episodes: 35
+  Converged at episode: 250
+================================================================================

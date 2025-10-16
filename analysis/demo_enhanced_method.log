@@ -1,0 +1,222 @@
+================================================================================
+ENHANCED METHOD DEMONSTRATION
+================================================================================
+
+Goal: Learn grandparent(X, Y) rule from examples
+
+Background Knowledge (7 facts):
+  parent(alice, bob)
+  parent(bob, charlie)
+  parent(eve, frank)
+  parent(frank, grace)
+  parent(diana, henry)
+  parent(henry, irene)
+  parent(grace, jack)
+
+Positive Examples (4):
+  grandparent(alice, charlie)
+  grandparent(eve, grace)
+  grandparent(diana, irene)
+  grandparent(frank, jack)
+
+Negative Examples (4):
+  grandparent(alice, alice)
+  grandparent(bob, bob)
+  grandparent(alice, eve)
+  grandparent(bob, frank)
+
+================================================================================
+CONFIGURATION
+================================================================================
+✓ Enhanced graph encoding (rich features + attention pooling)
+✓ Reward shaping penalties (disconnected: 0.2, self-loop: 0.3)
+✓ Paper improvements (detailed balance + replay buffer)
+
+================================================================================
+TRAINING (1000 episodes)
+================================================================================
+Episode    0: reward=0.4000, length=4
+  Latest sampled rule: grandparent(X0, X1).
+Episode  100: reward=0.3619, length=4
+  Latest sampled rule: grandparent(X0, X1) :- parent(X2, X3), parent(X4, X5).
+Episode  200: reward=0.4912, length=6
+  Latest sampled rule: grandparent(X0, X0) :- parent(X2, X2), parent(X2, X5).
+Episode  300: reward=0.0741, length=1
+  Latest sampled rule: grandparent(X0, X0) :- parent(X2, X3), parent(X5, X5).
+Episode  400: reward=0.2011, length=3
+  Latest sampled rule: grandparent(X0, X1) :- parent(X2, X0), parent(X5, X5).
+Episode  500: reward=0.2426, length=4
+  Latest sampled rule: grandparent(X0, X0) :- parent(X2, X2).
+Episode  600: reward=0.3841, length=7
+  Latest sampled rule: grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+Episode  700: reward=0.3475, length=7
+  Latest sampled rule: grandparent(X2, X2) :- parent(X2, X2), parent(X2, X2).
+Episode  800: reward=0.1797, length=4
+  Latest sampled rule: grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+Episode  900: reward=0.3251, length=8
+  Latest sampled rule: grandparent(X0, X1) :- parent(X1, X1), parent(X0, X0).
+
+================================================================================
+TRAINING RESULTS
+================================================================================
+
+Final avg reward (last 100): 0.2685
+Max reward: 0.7852
+High-reward episodes (>0.8): 0
+Unique rules discovered: 43
+
+================================================================================
+TOP DISCOVERED RULES
+================================================================================
+
+Showing top 10 rules by reward:
+
+1. [0.6452] grandparent(X0, X1) :- parent(X2, X1), parent(X2, X1).
+   Episode: 50
+   Coverage: 4/4 pos, 2/4 neg
+   Accuracy: 0.5000
+   Disconnected vars: 0 (penalty: -0.00)
+   Self-loops: 0 (penalty: -0.00)
+   Base reward: 0.4833
+
+2. [0.6391] grandparent(X0, X0) :- parent(X0, X0), parent(X4, X4).
+   Episode: 90
+   Coverage: 0/4 pos, 0/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 1 (penalty: -0.20)
+   Self-loops: 3 (penalty: -0.90)
+   Base reward: 0.0000
+
+3. [0.6223] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+   Episode: 250
+   Coverage: 0/4 pos, 0/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 0 (penalty: -0.00)
+   Self-loops: 3 (penalty: -0.90)
+   Base reward: 0.0000
+
+4. [0.5875] grandparent(X0, X0) :- parent(X0, X0), parent(X4, X5).
+   Episode: 20
+   Coverage: 0/4 pos, 0/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 2 (penalty: -0.40)
+   Self-loops: 2 (penalty: -0.60)
+   Base reward: 0.0000
+
+5. [0.5802] grandparent(X2, X2) :- parent(X2, X2), parent(X2, X2).
+   Episode: 320
+   Coverage: 0/4 pos, 0/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 0 (penalty: -0.00)
+   Self-loops: 3 (penalty: -0.90)
+   Base reward: 0.0000
+
+6. [0.5533] grandparent(X0, X1) :- parent(X0, X0), parent(X4, X1).
+   Episode: 80
+   Coverage: 0/4 pos, 0/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 0 (penalty: -0.00)
+   Self-loops: 1 (penalty: -0.30)
+   Base reward: 0.0000
+
+7. [0.4945] grandparent(X0, X0) :- parent(X2, X4), parent(X4, X5).
+   Episode: 10
+   Coverage: 0/4 pos, 2/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 3 (penalty: -0.60)
+   Self-loops: 1 (penalty: -0.30)
+   Base reward: 0.0000
+
+8. [0.4907] grandparent(X0, X0) :- parent(X2, X2), parent(X2, X5).
+   Episode: 200
+   Coverage: 0/4 pos, 0/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 2 (penalty: -0.40)
+   Self-loops: 2 (penalty: -0.60)
+   Base reward: 0.0000
+
+9. [0.4799] grandparent(X4, X1) :- parent(X2, X2), parent(X4, X5).
+   Episode: 40
+   Coverage: 0/4 pos, 0/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 1 (penalty: -0.20)
+   Self-loops: 1 (penalty: -0.30)
+   Base reward: 0.0000
+
+10. [0.4714] grandparent(X5, X5) :- parent(X2, X2), parent(X4, X5).
+   Episode: 240
+   Coverage: 0/4 pos, 0/4 neg
+   Accuracy: 0.0000
+   Disconnected vars: 1 (penalty: -0.20)
+   Self-loops: 2 (penalty: -0.60)
+   Base reward: 0.0000
+
+================================================================================
+REPLAY BUFFER ANALYSIS
+================================================================================
+
+Replay buffer size: 7
+
+Top 10 rules in replay buffer:
+
+1. [0.7852] grandparent(X0, X1) :- parent(X2, X1), parent(X4, X2).
+   Coverage: 4/4 pos, 0/4 neg
+   Issues: 0 disconnected, 0 self-loops
+   Base reward: 0.9333
+
+2. [0.7756] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+   Coverage: 0/4 pos, 0/4 neg
+   Issues: 0 disconnected, 3 self-loops
+   Base reward: 0.0000
+
+3. [0.7694] grandparent(X2, X2) :- parent(X2, X2), parent(X2, X2).
+   Coverage: 0/4 pos, 0/4 neg
+   Issues: 0 disconnected, 3 self-loops
+   Base reward: 0.0000
+
+4. [0.7534] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+   Coverage: 0/4 pos, 0/4 neg
+   Issues: 0 disconnected, 3 self-loops
+   Base reward: 0.0000
+
+5. [0.7519] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+   Coverage: 0/4 pos, 0/4 neg
+   Issues: 0 disconnected, 3 self-loops
+   Base reward: 0.0000
+
+6. [0.7267] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+   Coverage: 0/4 pos, 0/4 neg
+   Issues: 0 disconnected, 3 self-loops
+   Base reward: 0.0000
+
+7. [0.7095] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+   Coverage: 0/4 pos, 0/4 neg
+   Issues: 0 disconnected, 3 self-loops
+   Base reward: 0.0000
+
+================================================================================
+REPLAY BUFFER QUALITY STATISTICS
+================================================================================
+
+Perfect rules (100% pos, 0% neg): 1/7 (14.3%)
+Rules with disconnected variables: 0/7 (0.0%)
+Rules with self-loops: 6/7 (85.7%)
+
+================================================================================
+CONCLUSION
+================================================================================
+
+The enhanced method (reward shaping + enhanced encoding) discovers rules
+while penalizing structural issues like disconnected variables and self-loops.
+
+Key observations:
+1. Top rules should have high accuracy and few structural issues
+2. Replay buffer should contain mostly high-quality rules
+3. Pathological patterns should receive low rewards
+
+Expected best rule: grandparent(X0, X1) :- parent(X0, X2), parent(X2, X1)
+- Covers all positive examples
+- Excludes all negative examples
+- No disconnected variables (X2 connects X0 and X1)
+- No self-loops
+

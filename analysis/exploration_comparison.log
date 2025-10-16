@@ -1,0 +1,238 @@
+================================================================================
+EXPLORATION STRATEGY COMPARISON
+================================================================================
+
+================================================================================
+EXPERIMENT: Baseline (No Exploration)
+================================================================================
+Strategy: None (baseline)
+Episode   0: reward=0.0000, length=4, loss=316.4007
+Episode  20: reward=0.0250, length=5, loss=91.5830
+Episode  40: reward=0.0500, length=4, loss=52.2205
+Episode  60: reward=0.0333, length=7, loss=191.9326
+Episode  80: reward=0.0500, length=4, loss=53.2141
+Episode 100: reward=0.0500, length=4, loss=83.0847
+Episode 120: reward=0.1000, length=1, loss=19.8264
+Episode 140: reward=0.1000, length=1, loss=20.1829
+Episode 160: reward=0.1000, length=1, loss=20.3733
+Episode 180: reward=0.1000, length=1, loss=20.5762
+
+Sampling final theories...
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Average reward (last 50): 0.0960
+  Max reward: 0.1000
+  Average length (last 50): 1.24
+
+Final sampled theories (unique):
+  [0.1000] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Entropy Bonus (α=0.01)
+================================================================================
+Strategy: EntropyBonus(α=0.010000, decay=0.9999)
+Episode   0: reward=0.4750, length=4, loss=33.4332
+Episode  20: reward=0.1000, length=1, loss=16.5298
+Episode  40: reward=0.0333, length=7, loss=60.6660
+Episode  60: reward=0.0000, length=3, loss=310.8571
+Episode  80: reward=0.1000, length=1, loss=18.8526
+Episode 100: reward=0.1000, length=1, loss=19.4985
+Episode 120: reward=0.1000, length=1, loss=20.2303
+Episode 140: reward=0.1000, length=1, loss=20.7164
+Episode 160: reward=0.0333, length=7, loss=38.7161
+Episode 180: reward=0.1000, length=1, loss=20.8858
+
+Sampling final theories...
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Average reward (last 50): 0.0987
+  Max reward: 0.4750
+  Average length (last 50): 1.12
+
+Final sampled theories (unique):
+  [0.1000] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Temperature Schedule (T=2.0→0.5)
+================================================================================
+Strategy: Temperature(T=2.000, init=2.0, final=0.5)
+Episode   0: reward=0.0250, length=4, loss=76.9779
+Episode  20: reward=0.1000, length=1, loss=16.2104
+Episode  40: reward=0.1000, length=1, loss=16.2563
+Episode  60: reward=0.0250, length=4, loss=68.0860
+Episode  80: reward=0.1000, length=1, loss=18.3707
+Episode 100: reward=0.0500, length=4, loss=53.9133
+Episode 120: reward=0.1000, length=1, loss=20.6017
+Episode 140: reward=0.1000, length=1, loss=21.0462
+Episode 160: reward=0.1000, length=1, loss=20.9492
+Episode 180: reward=0.1000, length=1, loss=20.8397
+
+Sampling final theories...
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Average reward (last 50): 0.1000
+  Max reward: 0.1000
+  Average length (last 50): 1.00
+
+Final sampled theories (unique):
+  [0.1000] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Trajectory Length Bonus (β=0.05)
+================================================================================
+Strategy: TrajectoryBonus(β=0.050000, decay=0.9995)
+Episode   0: reward=0.1500, length=3, loss=50.1948
+Episode  20: reward=0.1495, length=1, loss=13.5641
+Episode  40: reward=0.1490, length=1, loss=14.1873
+Episode  60: reward=0.2441, length=4, loss=57.2995
+Episode  80: reward=0.2422, length=4, loss=58.0286
+Episode 100: reward=0.1476, length=1, loss=15.9262
+Episode 120: reward=0.1471, length=1, loss=16.2529
+Episode 140: reward=0.1466, length=1, loss=16.2576
+Episode 160: reward=0.1462, length=1, loss=16.5323
+Episode 180: reward=0.1457, length=1, loss=16.9841
+
+Sampling final theories...
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Average reward (last 50): 0.1606
+  Max reward: 0.4188
+  Average length (last 50): 1.48
+
+Final sampled theories (unique):
+  [0.2310] grandparent(X0, X0) :- parent(X0, X0).
+  [0.1452] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Epsilon Greedy (ε=0.2)
+================================================================================
+Strategy: EpsilonGreedy(ε=0.2000, min=0.05)
+Episode   0: reward=0.0250, length=5, loss=52.0407
+Episode  20: reward=0.0500, length=4, loss=84.5012
+Episode  40: reward=0.1000, length=1, loss=17.4707
+Episode  60: reward=0.1000, length=1, loss=18.6096
+Episode  80: reward=0.0500, length=4, loss=76.3338
+Episode 100: reward=0.1000, length=1, loss=20.7443
+Episode 120: reward=0.1000, length=1, loss=20.9495
+Episode 140: reward=0.1000, length=1, loss=20.8577
+Episode 160: reward=0.1000, length=1, loss=20.7353
+Episode 180: reward=0.1000, length=1, loss=20.7152
+
+Sampling final theories...
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Average reward (last 50): 0.0897
+  Max reward: 0.4750
+  Average length (last 50): 1.60
+
+Final sampled theories (unique):
+  [0.1000] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Curiosity Bonus
+================================================================================
+Strategy: Curiosity(atoms=0.1, diversity=0.05)
+Episode   0: reward=0.3750, length=4, loss=35.2450
+Episode  20: reward=0.3750, length=8, loss=81.7069
+Episode  40: reward=0.3750, length=5, loss=66.7282
+Episode  60: reward=0.2000, length=4, loss=58.1546
+Episode  80: reward=0.8250, length=5, loss=9.7642
+Episode 100: reward=0.2000, length=4, loss=34.4724
+Episode 120: reward=0.1000, length=1, loss=17.3243
+Episode 140: reward=0.3500, length=3, loss=17.7052
+Episode 160: reward=0.1000, length=1, loss=18.8876
+Episode 180: reward=0.1000, length=1, loss=20.1448
+
+Sampling final theories...
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Average reward (last 50): 0.1335
+  Max reward: 0.8250
+  Average length (last 50): 1.76
+
+Final sampled theories (unique):
+  [0.2000] grandparent(X0, X0) :- parent(X0, X0).
+  [0.1000] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Combined Balanced
+================================================================================
+Strategy: Combined[EntropyBonus(α=0.010000, decay=0.9999), Temperature(T=1.500, init=1.5, final=0.5)]
+Episode   0: reward=0.1000, length=1, loss=15.5407
+Episode  20: reward=0.0250, length=4, loss=61.8485
+Episode  40: reward=0.0000, length=3, loss=346.0651
+Episode  60: reward=0.0500, length=4, loss=83.9460
+Episode  80: reward=0.1000, length=1, loss=18.7614
+Episode 100: reward=0.1000, length=1, loss=19.9586
+Episode 120: reward=0.0500, length=4, loss=77.7823
+Episode 140: reward=0.1000, length=1, loss=20.9182
+Episode 160: reward=0.1000, length=1, loss=20.8392
+Episode 180: reward=0.1000, length=1, loss=20.7094
+
+Sampling final theories...
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Average reward (last 50): 0.0990
+  Max reward: 0.4750
+  Average length (last 50): 1.06
+
+Final sampled theories (unique):
+  [0.1000] grandparent(X0, X0).
+
+================================================================================
+EXPERIMENT: Combined Aggressive
+================================================================================
+Strategy: Combined[EntropyBonus(α=0.050000, decay=0.9998), Temperature(T=3.000, init=3.0, final=0.5), TrajectoryBonus(β=0.100000, decay=0.999)]
+Episode   0: reward=0.5250, length=5, loss=39.3627
+Episode  20: reward=0.1980, length=1, loss=11.1328
+Episode  40: reward=0.6975, length=7, loss=40.8213
+Episode  60: reward=0.4959, length=5, loss=25.1133
+Episode  80: reward=0.1923, length=1, loss=11.2995
+Episode 100: reward=0.4774, length=5, loss=46.7145
+Episode 120: reward=0.1887, length=1, loss=11.6781
+Episode 140: reward=0.1869, length=1, loss=11.8270
+Episode 160: reward=0.2556, length=3, loss=30.2913
+Episode 180: reward=0.1835, length=1, loss=12.8614
+
+Sampling final theories...
+
+--------------------------------------------------------------------------------
+RESULTS:
+  Average reward (last 50): 0.3821
+  Max reward: 0.9198
+  Average length (last 50): 3.64
+
+Final sampled theories (unique):
+  [0.6064] grandparent(X1, X1) :- parent(X1, X1), parent(X1, X1).
+  [0.6064] grandparent(X0, X0) :- parent(X0, X0), parent(X0, X0).
+  [0.1819] grandparent(X0, X0).
+
+================================================================================
+FINAL COMPARISON
+================================================================================
+
+Strategy                                   Avg Reward   Max Reward   Avg Length
+--------------------------------------------------------------------------------
+Combined Aggressive                            0.3821       0.9198         3.64
+Trajectory Length Bonus (β=0.05)               0.1606       0.4188         1.48
+Curiosity Bonus                                0.1335       0.8250         1.76
+Temperature Schedule (T=2.0→0.5)               0.1000       0.1000         1.00
+Combined Balanced                              0.0990       0.4750         1.06
+Entropy Bonus (α=0.01)                         0.0987       0.4750         1.12
+Baseline (No Exploration)                      0.0960       0.1000         1.24
+Epsilon Greedy (ε=0.2)                         0.0897       0.4750         1.60
+
+✓ Results saved to /Users/jq23948/GFLowNet-ILP/analysis/exploration_comparison_results.json
+
+================================================================================
+WINNER: Combined Aggressive
+  Average reward (last 50 episodes): 0.3821
+  Max reward achieved: 0.9198
+================================================================================

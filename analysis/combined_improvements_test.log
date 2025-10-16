@@ -1,0 +1,96 @@
+================================================================================
+COMBINED IMPROVEMENTS TEST
+================================================================================
+
+Configuration:
+  Episodes: 2000
+  Embedding dim: 32
+  GNN layers: 2
+  Target: grandparent(X, Y)
+  Positive examples: 4
+  Negative examples: 4
+  Background facts: 7
+
+================================================================================
+CONFIGURATION 1: BASELINE
+================================================================================
+  - Original graph encoding
+  - NO reward shaping penalties
+  - Paper improvements: Detailed balance + Replay buffer + Reward weighting
+
+Training baseline for 2000 episodes...
+Episode    0: reward=0.7000, length=7
+Episode  200: reward=0.0819, length=1
+Episode  400: reward=0.4691, length=7
+Episode  600: reward=0.4118, length=5
+Episode  800: reward=0.1797, length=4
+Episode 1000: reward=0.1838, length=5
+Episode 1200: reward=0.5954, length=4
+Episode 1400: reward=0.0986, length=4
+Episode 1600: reward=0.1210, length=6
+Episode 1800: reward=0.0991, length=6
+
+Baseline Results:
+  Final avg reward (last 100): 0.1062
+  Max reward: 1.2051
+  High-reward episodes (>0.8): 8
+  Final avg trajectory length: 6.34
+
+================================================================================
+CONFIGURATION 2: COMBINED IMPROVEMENTS
+================================================================================
+  - Enhanced graph encoding (rich features + attention pooling)
+  - Reward shaping penalties (disconnected: 0.2, self-loop: 0.3)
+  - Paper improvements: Detailed balance + Replay buffer + Reward weighting
+
+Training with combined improvements for 2000 episodes...
+Episode    0: reward=0.7000, length=7
+Episode  200: reward=0.6549, length=8
+Episode  400: reward=0.3351, length=5
+Episode  600: reward=0.4389, length=8
+Episode  800: reward=0.3144, length=7
+Episode 1000: reward=0.2942, length=8
+Episode 1200: reward=0.2408, length=8
+Episode 1400: reward=0.1725, length=7
+Episode 1600: reward=0.1210, length=6
+Episode 1800: reward=0.1321, length=8
+
+Combined Results:
+  Final avg reward (last 100): 0.1226
+  Max reward: 0.8862
+  High-reward episodes (>0.8): 4
+  Final avg trajectory length: 6.39
+
+================================================================================
+COMPARISON
+================================================================================
+
+  Metric                    Baseline        Combined       
+  Final Avg Reward          0.1062          0.1226         
+  Max Reward                1.2051          0.8862         
+  High-Reward Episodes      8               4              
+  Avg Trajectory Length     6.34            6.39           
+
+--------------------------------------------------------------------------------
+IMPROVEMENTS OVER BASELINE
+--------------------------------------------------------------------------------
+
+Avg reward improvement: +15.4%
+High-reward episode increase: -4
+
+
+Results saved to: analysis/combined_improvements_results.json
+
+================================================================================
+CONCLUSION
+================================================================================
+
+Expected outcomes:
+1. Enhanced encoding should help model learn structural patterns faster
+2. Reward shaping should reduce pathological rules in replay buffer
+3. Combined improvements should achieve higher quality rules
+
+The test validates whether architectural improvements (enhanced encoding) and
+reward engineering (structural penalties) provide additive benefits beyond
+the paper-based algorithmic improvements (detailed balance, replay buffer).
+

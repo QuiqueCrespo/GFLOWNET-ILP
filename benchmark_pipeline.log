@@ -1,0 +1,207 @@
+================================================================================
+GFLOWNET-ILP BENCHMARK PIPELINE
+================================================================================
+
+Found 56 benchmarks
+Testing enhanced method with:
+  - Action mask (prevents ADD_ATOM at max body length)
+  - Free variable constraint (no free vars in terminal states)
+  - Reward shaping (penalties for structural issues)
+  - Enhanced encoding (rich features + attention)
+
+Running on first 10 benchmarks (quick test)...
+To run all, modify test_benchmarks = benchmarks
+
+
+================================================================================
+BENCHMARK: 1d_flip
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 1.5s
+  Best reward: 0.7678
+  Best rule: out(X0, X0, X6) :- v2(X0), x16(X0), different_pos(X0, X6).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: 1d_pcopy_1c
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 1.5s
+  Best reward: 0.8638
+  Best rule: out(X0, X0, X0) :- position(X0), x14(X0), empty(X0, X0).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: andersen
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 1.2s
+  Best reward: 0.8991
+  Best rule: pt(X0, X1) :- addr(X0, X0), assgn(X0, X0), assgn(X1, X0).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: iggp-attrition-next-score
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 1.4s
+  Best reward: 0.9598
+  Best rule: next_score(X6, X6, X6) :- my_true_score(X6, X6, X6), c15(X6), c80(X6).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: iggp-buttons-goal
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 1.3s
+  Best reward: 0.7912
+  Best rule: goal(X0, X0, X0) :- int_49(X0), int_61(X0), prop_r(X0).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: iggp-buttons-next
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 1.4s
+  Best reward: 0.7377
+  Best rule: next(X0, X0) :- not_my_true_a(X0), my_succ(X0, X0), c_a(X0).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: iggp-coins-goal
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 1.6s
+  Best reward: 0.8991
+  Best rule: goal(X4, X6, X6) :- my_true_cell(X6, X4, X6), score_31(X6), score_73(X6).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: iggp-coins-next-cell
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 2.8s
+  Best reward: 0.9792
+  Best rule: next_cell(X1, X1, X6) :- different(X6, X6), c_twocoins(X6), my_true_cell(X6, X1, X1).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: iggp-connect4team-next-control
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 10.1s
+  Best reward: 0.6719
+  Best rule: next_control(X0, X1) :- does_drop(X1, X0, X0), action(X0), mypos_8(X6).
+  Free variables: 0
+
+================================================================================
+BENCHMARK: iggp-dont-touch-next-control
+================================================================================
+  Status: completed
+  Episodes: 100
+  Time: 2.0s
+  Best reward: 0.7526
+  Best rule: next_control(X1, X1) :- agent_black(X1), score(X1), true_control(X1, X1).
+  Free variables: 0
+
+================================================================================
+PIPELINE RESULTS SUMMARY
+================================================================================
+
+Total benchmarks tested: 10
+  Completed: 10
+  Errors: 0
+
+================================================================================
+COMPLETED BENCHMARKS
+================================================================================
+
+1d_flip:
+  Episodes: 100
+  Time: 1.5s
+  Best reward: 0.7678
+  Free variables: 0
+  Best rule: out(X0, X0, X6) :- v2(X0), x16(X0), different_pos(X0, X6)....
+
+1d_pcopy_1c:
+  Episodes: 100
+  Time: 1.5s
+  Best reward: 0.8638
+  Free variables: 0
+  Best rule: out(X0, X0, X0) :- position(X0), x14(X0), empty(X0, X0)....
+
+andersen:
+  Episodes: 100
+  Time: 1.2s
+  Best reward: 0.8991
+  Free variables: 0
+  Best rule: pt(X0, X1) :- addr(X0, X0), assgn(X0, X0), assgn(X1, X0)....
+
+iggp-attrition-next-score:
+  Episodes: 100
+  Time: 1.4s
+  Best reward: 0.9598
+  Free variables: 0
+  Best rule: next_score(X6, X6, X6) :- my_true_score(X6, X6, X6), c15(X6), c80(X6)....
+
+iggp-buttons-goal:
+  Episodes: 100
+  Time: 1.3s
+  Best reward: 0.7912
+  Free variables: 0
+  Best rule: goal(X0, X0, X0) :- int_49(X0), int_61(X0), prop_r(X0)....
+
+iggp-buttons-next:
+  Episodes: 100
+  Time: 1.4s
+  Best reward: 0.7377
+  Free variables: 0
+  Best rule: next(X0, X0) :- not_my_true_a(X0), my_succ(X0, X0), c_a(X0)....
+
+iggp-coins-goal:
+  Episodes: 100
+  Time: 1.6s
+  Best reward: 0.8991
+  Free variables: 0
+  Best rule: goal(X4, X6, X6) :- my_true_cell(X6, X4, X6), score_31(X6), score_73(X6)....
+
+iggp-coins-next-cell:
+  Episodes: 100
+  Time: 2.8s
+  Best reward: 0.9792
+  Free variables: 0
+  Best rule: next_cell(X1, X1, X6) :- different(X6, X6), c_twocoins(X6), my_true_cell(X6, X1,...
+
+iggp-connect4team-next-control:
+  Episodes: 100
+  Time: 10.1s
+  Best reward: 0.6719
+  Free variables: 0
+  Best rule: next_control(X0, X1) :- does_drop(X1, X0, X0), action(X0), mypos_8(X6)....
+
+iggp-dont-touch-next-control:
+  Episodes: 100
+  Time: 2.0s
+  Best reward: 0.7526
+  Free variables: 0
+  Best rule: next_control(X1, X1) :- agent_black(X1), score(X1), true_control(X1, X1)....
+
+================================================================================
+STATISTICS
+================================================================================
+Average best reward: 0.8322
+Total free variables: 0
+Free variable rate: 0.0%
+
+✓ SUCCESS: No free variables in any benchmark!
+
+Results saved to: /Users/jq23948/GFLowNet-ILP/benchmark_results.json
