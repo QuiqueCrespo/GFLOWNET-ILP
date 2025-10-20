@@ -11,12 +11,12 @@ from collections import deque
 import random
 
 from .logic_structures import (
-    Theory, Variable, get_all_variables, is_terminal,
+    Theory, Variable, get_all_variables, is_terminal, is_valid_complete_state,
     apply_add_atom, apply_unify_vars, get_valid_variable_pairs,
     theory_to_string
 )
 from .logic_engine import Example
-from .graph_encoder import GraphConstructor, StateEncoder
+from .ß import GraphConstructor, StateEncoder
 from .gflownet_models import HierarchicalGFlowNet
 from .reward import RewardCalculator
 
@@ -27,7 +27,7 @@ class TrajectoryStep:
     def __init__(self, state: Theory, action_type: str, action_detail: any,
                  log_pf: torch.Tensor, next_state: Theory):
         self.state = state
-        self.action_type = action_type  # 'ADD_ATOM' or 'UNIFY_VARIABLES'
+        self.action_type = action_type  # 'ADD_ATOM', 'UNIFY_VARIABLES' or 'TERMINATE'
         self.action_detail = action_detail
         self.log_pf = log_pf
         self.next_state = next_state
@@ -75,6 +75,7 @@ class GFlowNetTrainer:
                  reward_calculator: RewardCalculator,
                  predicate_vocab: List[str],
                  predicate_arities: Dict[str, int],
+                 max_body_length: int = 4,
                  learning_rate: float = 1e-4,
                  exploration_strategy=None,
                  reward_weighted_loss: bool = False,
@@ -82,7 +83,8 @@ class GFlowNetTrainer:
                  use_detailed_balance: bool = False,
                  use_replay_buffer: bool = False,
                  replay_buffer_capacity: int = 50,
-                 replay_probability: float = 0.3):
+                 replay_probability: float = 0.3,
+                 buffer_reward_threshold: float = 0.7):
         """
         Args:
             state_encoder: GNN encoder for states
@@ -105,6 +107,7 @@ class GFlowNetTrainer:
         self.graph_constructor = graph_constructor
         self.reward_calculator = reward_calculator
         self.predicate_vocab = predicate_vocab
+        self.max_body_length = max_body_length
         self.predicate_arities = predicate_arities
         self.exploration_strategy = exploration_strategy
         self.reward_weighted_loss = reward_weighted_loss
@@ -112,6 +115,7 @@ class GFlowNetTrainer:
         self.use_detailed_balance = use_detailed_balance
         self.use_replay_buffer = use_replay_buffer
         self.replay_probability = replay_probability
+        self.buffer_reward_threshold = buffer_reward_threshold
 
         # Learnable log partition function (for TB loss)
         self.log_Z = torch.nn.Parameter(torch.tensor([0.0]))
@@ -138,7 +142,7 @@ class GFlowNetTrainer:
         state_embedding = state_embedding.squeeze(0)
 
         # --- Get strategist log probability (ADD_ATOM vs UNIFY_VARIABLES) ---
-        action_logits, _ = self.gflownet.forward_strategist(state_embedding)
+        action_logits = self.gflownet.forward_strategist(state_embedding)
         action_probs = F.softmax(action_logits, dim=-1)
         action_idx = 0 if action_type == 'ADD_ATOM' else 1
         log_prob_action = torch.log(action_probs[action_idx] + 1e-10)
@@ -195,21 +199,35 @@ class GFlowNetTrainer:
         current_state = initial_state
         max_var_id = max([v.id for v in get_all_variables(current_state)], default=-1)
         step_count = 0
+        terminated_by_policy = False
 
-        while not is_terminal(current_state) and step_count < max_steps:
-            # Encode current state
-            graph_data = self.graph_constructor.theory_to_graph(current_state)
-            state_embedding, node_embeddings = self.state_encoder(graph_data)
-            state_embedding = state_embedding.squeeze(0)  # Remove batch dim
+        # Cache for state embeddings to avoid recomputation
+        # Key: theory_to_string(state), Value: (state_embedding, node_embeddings)
+        embedding_cache = {}
+
+        # Continue until policy chooses TERMINATE or max_steps reached
+        # Don't force termination based on state validity - let policy decide
+        while step_count < max_steps and not terminated_by_policy:
+            # Check cache first
+            state_key = theory_to_string(current_state)
+            if state_key in embedding_cache:
+                state_embedding, node_embeddings = embedding_cache[state_key]
+            else:
+                # Encode current state
+                graph_data = self.graph_constructor.theory_to_graph(current_state)
+                state_embedding, node_embeddings = self.state_encoder(graph_data)
+                state_embedding = state_embedding.squeeze(0)  # Remove batch dim
+                # Cache for potential reuse
+                embedding_cache[state_key] = (state_embedding, node_embeddings)
 
             # Check if body length limit reached
             rule = current_state[0]
             body_length = len(rule.body)
-            max_body_length = 3
+            max_body_length = self.max_body_length
             at_max_length = body_length >= max_body_length
 
             # Get strategist action
-            action_logits, _ = self.gflownet.forward_strategist(state_embedding)
+            action_logits = self.gflownet.forward_strategist(state_embedding)
 
             # Apply exploration strategy to logits
             if self.exploration_strategy:
@@ -219,15 +237,22 @@ class GFlowNetTrainer:
                     step_count=step_count
                 )
 
-            # Apply action mask: prevent ADD_ATOM at max body length
+            # Apply action masks
+            action_logits = action_logits.clone()
+
+            # 1. Mask ADD_ATOM at max body length
             if at_max_length:
-                # Mask out ADD_ATOM (index 0) by setting to -inf
-                action_logits = action_logits.clone()
                 action_logits[0] = float('-inf')
+
+            # 2. Mask TERMINATE for invalid/incomplete states
+            # Only allow TERMINATE if state is valid and complete
+            # (all head variables appear in body)
+            if not is_valid_complete_state(current_state):
+                action_logits[2] = float('-inf')
 
             action_probs = F.softmax(action_logits, dim=-1)
 
-            # Sample action: 0=ADD_ATOM, 1=UNIFY_VARIABLES
+            # Sample action: 0=ADD_ATOM, 1=UNIFY_VARIABLES 2=TERMINATE
             action = torch.multinomial(action_probs, 1).item()
             log_prob_action = torch.log(action_probs[action] + 1e-10)
 
@@ -262,12 +287,13 @@ class GFlowNetTrainer:
                 )
                 action_detail = ('ADD_ATOM', pred_name)
 
-            else:  # UNIFY_VARIABLES
+            elif action == 1:  # UNIFY_VARIABLES
                 # Get valid variable pairs
                 valid_pairs = get_valid_variable_pairs(current_state)
 
                 if not valid_pairs:
                     # No valid pairs - fall back to ADD_ATOM
+                    # Note: consider masking for future steps
                     action_failed = True
 
                 # Get variable embeddings
@@ -302,6 +328,8 @@ class GFlowNetTrainer:
                                 state=current_state,
                                 step_count=step_count
                             )
+                        
+                        
                         atom_probs = F.softmax(atom_logits, dim=-1)
                         pred_idx = torch.multinomial(atom_probs, 1).item()
                         pred_name = self.predicate_vocab[pred_idx]
@@ -311,6 +339,15 @@ class GFlowNetTrainer:
                             current_state, pred_name, pred_arity, max_var_id
                         )
                         action_detail = ('ADD_ATOM', pred_name)
+                    else:
+                        # CRITICAL FIX: If at max length and UNIFY fails, we MUST terminate.
+                        # Treat this as a terminal state for this trajectory.
+                        terminated_by_policy = True
+                        action_detail = ('TERMINATE', None) # Log a termination
+                        next_state = current_state
+                        log_prob_detail = torch.tensor(0.0)
+                        log_prob_action = torch.log(action_probs[2] + 1e-10) # Use log_prob of TERMINATE
+                        
                     # If at max length and action failed, next_state stays None
                     # which will cause an error when recording trajectory
                     # So we need to skip this iteration without recording
@@ -325,6 +362,17 @@ class GFlowNetTrainer:
                     next_state = apply_unify_vars(current_state, var1, var2)
                     action_detail = ('UNIFY_VARIABLES', (var1, var2))
 
+            elif action == 2:  # TERMINATE
+                # Terminate action
+                next_state = current_state  # State remains the same
+                action_detail = ('TERMINATE', None)
+                terminated_by_policy = True
+                log_prob_detail = torch.tensor(0.0)
+                
+            else:
+                raise ValueError(f"Unknown action index: {action}")
+        
+
             # Combined log probability
             log_pf = log_prob_action + log_prob_detail
 
@@ -336,6 +384,9 @@ class GFlowNetTrainer:
                 log_pf=log_pf,
                 next_state=next_state
             ))
+
+            if terminated_by_policy:
+                break
 
             current_state = next_state
             step_count += 1
@@ -380,12 +431,31 @@ class GFlowNetTrainer:
         # Log reward
         log_reward = torch.log(torch.tensor(scaled_reward, dtype=torch.float32) + 1e-8)
 
-        # Backward probability: use uniform backward policy
-        # P_B(s|s') = 1 / num_possible_parents(s')
-        # For simplicity, assume uniform backward: log P_B ≈ -log(num_actions)
-        # This is a simplified approximation
-        sum_log_pb = -np.log(len(self.predicate_vocab) + 10) * len(trajectory)
-        sum_log_pb = torch.tensor(sum_log_pb, dtype=torch.float32)
+        # Backward probability: compute using the backward policy model
+        # P_B(s|s') = backward probability of going from next_state to state
+        sum_log_pb = torch.tensor(0.0, dtype=torch.float32)
+
+        for step in trajectory:
+            # Encode next state to get its embedding
+            graph_data_next = self.graph_constructor.theory_to_graph(step.next_state)
+            next_state_embedding, node_embeddings = self.state_encoder(graph_data_next)
+            next_state_embedding = next_state_embedding.squeeze(0)
+
+            # Get variable embeddings if needed for sophisticated backward policy
+            
+            variables = get_all_variables(step.next_state)
+            var_embeddings = node_embeddings[:len(variables)] if len(variables) > 0 else None
+
+            # Get log probability of backward transition from next_state to state
+            log_pb_step = self.gflownet.get_backward_log_probability(
+                next_state_embedding,
+                step.next_state,
+                step.state,
+                step.action_type,
+                step.action_detail,
+                var_embeddings
+            )
+            sum_log_pb = sum_log_pb + log_pb_step
 
         # Trajectory Balance loss
         loss = (self.log_Z + sum_log_pf - log_reward - sum_log_pb) ** 2
@@ -393,7 +463,7 @@ class GFlowNetTrainer:
         # Apply reward weighting if configured
         if self.reward_weighted_loss:
             # Weight by reward: high-reward trajectories get more weight
-            weight = reward / (reward + 0.1)  # Normalized weight
+            weight = reward / (reward + 0.1)
             loss = weight * loss
 
         return loss
@@ -419,15 +489,18 @@ class GFlowNetTrainer:
             # For simplicity, use log_Z as initial flow and propagate
             # In full implementation, would use separate flow network
 
+            # Current state embedding
+            graph_data = self.graph_constructor.theory_to_graph(step.state)
+            state_embedding, _ = self.state_encoder(graph_data)
+            state_embedding = state_embedding.squeeze(0)
+            # Next state embedding
+            graph_data_next = self.graph_constructor.theory_to_graph(step.next_state)
+            next_state_embedding, node_embeddings_next = self.state_encoder(graph_data_next)
+            next_state_embedding = next_state_embedding.squeeze(0)
+
             # Forward transition: s -> s'
             # log F(s) + log P_F(s->s')
-            if i == 0:
-                # Initial state flow is log_Z
-                log_F_s = self.log_Z
-            else:
-                # Flow accumulates from initial state
-                # This is simplified; ideally would use state-specific flow network
-                log_F_s = self.log_Z + sum(trajectory[j].log_pf for j in range(i))
+            log_F_s = self.gflownet.forward_flow(state_embedding)
 
             # Forward flow
             log_forward = log_F_s + step.log_pf
@@ -439,10 +512,22 @@ class GFlowNetTrainer:
                 log_F_s_next = torch.log(torch.tensor(scaled_reward, dtype=torch.float32) + 1e-8)
             else:
                 # Non-terminal: accumulate forward flow
-                log_F_s_next = self.log_Z + sum(trajectory[j].log_pf for j in range(i + 1))
+                log_F_s_next = self.gflownet.forward_flow(next_state_embedding).squeeze()
 
-            # Backward probability (uniform approximation)
-            log_pb = torch.tensor(-np.log(len(self.predicate_vocab) + 10), dtype=torch.float32)
+            # Backward probability: P_B(s'->s)
+            # The backward policy gives the probability of going back from next_state to state
+            # Get variable embeddings for sophisticated backward policy
+            variables = get_all_variables(step.next_state)
+            var_embeddings = node_embeddings_next[:len(variables)] if len(variables) > 0 else None
+
+            log_pb = self.gflownet.get_backward_log_probability(
+                next_state_embedding,
+                step.next_state,
+                step.state,
+                step.action_type,
+                step.action_detail,
+                var_embeddings
+            )
             log_backward = log_F_s_next + log_pb
 
             # Detailed balance constraint: forward flow = backward flow
@@ -475,7 +560,7 @@ class GFlowNetTrainer:
             return {'loss': 0.0, 'reward': on_policy_reward, 'trajectory_length': 0}
 
         # Add high-reward trajectories to the replay buffer
-        if self.replay_buffer is not None and on_policy_reward > 0.7:
+        if self.replay_buffer is not None and on_policy_reward > self.buffer_reward_threshold:
             self.replay_buffer.add(on_policy_trajectory, on_policy_reward)
 
         # Calculate the loss for the new (on-policy) trajectory

@@ -11,29 +11,59 @@ class RewardCalculator:
     """Calculates reward for a theory based on coverage and simplicity."""
 
     def __init__(self, logic_engine: LogicEngine,
-                 weight_pos: float = 0.8,
-                 weight_neg: float = 0.8,
+                 weight_precision: float = 0.5,
+                 weight_recall: float = 0.5,
                  weight_simplicity: float = 0.01,
                  disconnected_var_penalty: float = 0.2,
                  self_loop_penalty: float = 0.3,
-                 free_var_penalty: float = 1.0):
+                 free_var_penalty: float = 1.0,
+                 use_f1: bool = False):
         """
+        Initialize reward calculator using confusion matrix metrics.
+
+        Confusion Matrix:
+            Theory entails example:     YES         NO
+            Positive example:           TP          FN
+            Negative example:           FP          TN
+
+        Metrics:
+            - Precision = TP / (TP + FP)  [fraction of entailed examples that are positive]
+            - Recall = TP / (TP + FN)     [fraction of positive examples that are entailed]
+            - F1-score = 2 * (Precision * Recall) / (Precision + Recall)
+            - Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+        Reward Formula (default):
+            R = w_precision * precision + w_recall * recall + w_simplicity * simplicity - penalties
+
+        Reward Formula (if use_f1=True):
+            R = F1-score + w_simplicity * simplicity - penalties
+
         Args:
             logic_engine: Logic engine for evaluating entailment
-            weight_pos: Weight for positive example coverage (default: 0.8, heavily penalize false negatives)
-            weight_neg: Weight for negative example consistency - not covering them (default: 0.2, penalize false positives)
-            weight_simplicity: Weight for simplicity (default: 0.01, minimal - fewer atoms is nice but not critical)
+            weight_precision: Weight for precision (default: 0.5)
+                             Precision penalizes false positives (covering negatives)
+            weight_recall: Weight for recall (default: 0.5)
+                          Recall penalizes false negatives (missing positives)
+            weight_simplicity: Weight for simplicity bonus (default: 0.01)
             disconnected_var_penalty: Penalty per disconnected variable (default: 0.2)
             self_loop_penalty: Penalty per self-loop (default: 0.3)
-            free_var_penalty: Penalty per free variable in head (default: 1.0, CRITICAL - makes rule invalid)
+            free_var_penalty: Penalty per free variable in head (default: 1.0)
+            use_f1: If True, use F1-score instead of weighted precision+recall (default: False)
+
+        Theoretical Notes:
+            - Confusion matrix provides complete picture of classification performance
+            - Precision and recall are standard metrics in machine learning
+            - F1-score is harmonic mean, giving balanced importance to both
+            - Minimum reward of 1e-6 ensures GFlowNet numerical stability
         """
         self.logic_engine = logic_engine
-        self.weight_pos = weight_pos
-        self.weight_neg = weight_neg
+        self.weight_precision = weight_precision
+        self.weight_recall = weight_recall
         self.weight_simplicity = weight_simplicity
         self.disconnected_var_penalty = disconnected_var_penalty
         self.self_loop_penalty = self_loop_penalty
         self.free_var_penalty = free_var_penalty
+        self.use_f1 = use_f1
 
     def _count_disconnected_variables(self, theory: Theory) -> int:
         """
@@ -123,108 +153,56 @@ class RewardCalculator:
 
         free_vars = head_vars - body_vars
         return len(free_vars)
+    
 
     def calculate_reward(self, theory: Theory,
                         positive_examples: List[Example],
                         negative_examples: List[Example]) -> float:
         """
-        Calculate reward for a theory.
+        Calculate reward using confusion matrix metrics.
 
-        Reward components:
-        1. Positive coverage: fraction of positive examples entailed by theory
-        2. Consistency: 1 - (fraction of negative examples entailed by theory)
-        3. Simplicity: penalty for complexity (number of atoms in body)
-        4. Structural penalties: disconnected variables, self-loops
+        Confusion Matrix:
+            - TP (True Positives): Positive examples that theory entails
+            - FN (False Negatives): Positive examples that theory does NOT entail
+            - FP (False Positives): Negative examples that theory entails (BAD!)
+            - TN (True Negatives): Negative examples that theory does NOT entail
+
+        Metrics:
+            - Precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+            - Recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+            - F1 = 2 * (P * R) / (P + R) if (P + R) > 0 else 0
 
         Returns:
             Reward value (guaranteed to be > 0 for numerical stability)
         """
-        # 1. Positive example coverage
-        if positive_examples:
-            pos_covered = sum(1 for ex in positive_examples
-                            if self.logic_engine.entails(theory, ex))
-            score_pos = pos_covered / len(positive_examples)
-        else:
-            score_pos = 0.0
+        # Compute confusion matrix
+        TP = sum(1 for ex in positive_examples if self.logic_engine.entails(theory, ex))
+        FN = len(positive_examples) - TP
+        FP = sum(1 for ex in negative_examples if self.logic_engine.entails(theory, ex))
+        TN = len(negative_examples) - FP
 
-        # 2. Negative example consistency (should NOT cover negatives)
-        if negative_examples:
-            neg_covered = sum(1 for ex in negative_examples
-                            if self.logic_engine.entails(theory, ex))
-            score_neg = 1.0 - (neg_covered / len(negative_examples))
+        # Compute precision and recall
+        if TP + FP > 0:
+            precision = TP / (TP + FP)
         else:
-            score_neg = 1.0
+            # Theory entails nothing - precision is undefined, use 0
+            precision = 0.0
 
-        # 3. Simplicity (Occam's razor) - prefer simpler theories
+        if TP + FN > 0:
+            recall = TP / (TP + FN)
+        else:
+            # No positive examples - recall is undefined, use 0
+            recall = 0.0
+
+        # Compute F1-score
+        if precision + recall > 0:
+            f1_score = 2 * (precision * recall) / (precision + recall)
+        else:
+            f1_score = 0.0
+
+        # Simplicity (Occam's razor) - prefer simpler theories
         total_atoms = sum(len(rule.body) for rule in theory)
         simplicity = 1.0 / (1.0 + total_atoms)
-
-        # Penalty for rules that cover EVERYTHING (both all positives AND all negatives)
-        # These are uninformative - they don't discriminate
-        # Rules with variable unification in the head (like target(X, X)) are fine
-        if score_pos == 1.0 and score_neg == 0.0:
-            # Covers all positives AND all negatives = uninformative
-            uninformative_penalty = 0.9
-        else:
-            uninformative_penalty = 0.0
-
-        # 4. Structural penalties
-        num_disconnected = self._count_disconnected_variables(theory)
-        num_self_loops = self._count_self_loops(theory)
-        num_free_vars = self._count_free_variables(theory)
-
-        disconnected_penalty_value = self.disconnected_var_penalty * num_disconnected
-        self_loop_penalty_value = self.self_loop_penalty * num_self_loops
-        free_var_penalty_value = self.free_var_penalty * num_free_vars
-
-        if score_pos == 0.0:
-            reward = 1e-6 # Return minimum reward
-        else:
-            accuracy = score_pos * score_neg
-
-            reward = (0.9 * accuracy +
-                0.1 * simplicity -
-                uninformative_penalty -
-                disconnected_penalty_value -
-                self_loop_penalty_value -
-                free_var_penalty_value)
-
-        # Ensure minimum reward for numerical stability (avoid log(0))
-        return max(reward, 1e-6)
-
-    def get_detailed_scores(self, theory: Theory,
-                           positive_examples: List[Example],
-                           negative_examples: List[Example]) -> dict:
-        """
-        Get detailed breakdown of reward components.
-        """
-        # Positive coverage
-        if positive_examples:
-            pos_covered = sum(1 for ex in positive_examples
-                            if self.logic_engine.entails(theory, ex))
-            score_pos = pos_covered / len(positive_examples)
-        else:
-            pos_covered = 0
-            score_pos = 0.0
-
-        # Negative consistency
-        if negative_examples:
-            neg_covered = sum(1 for ex in negative_examples
-                            if self.logic_engine.entails(theory, ex))
-            score_neg = 1.0 - (neg_covered / len(negative_examples))
-        else:
-            neg_covered = 0
-            score_neg = 1.0
-
-        # Simplicity
-        total_atoms = sum(len(rule.body) for rule in theory)
-        simplicity = 1.0 / (1.0 + total_atoms)
-
-        # Uninformative rule penalty
-        if score_pos == 1.0 and score_neg == 0.0:
-            uninformative_penalty = 0.9
-        else:
-            uninformative_penalty = 0.0
 
         # Structural penalties
         num_disconnected = self._count_disconnected_variables(theory)
@@ -235,30 +213,129 @@ class RewardCalculator:
         self_loop_penalty_value = self.self_loop_penalty * num_self_loops
         free_var_penalty_value = self.free_var_penalty * num_free_vars
 
-        if score_pos == 0.0:
-            reward = 1e-6 # Return minimum reward
-            accuracy = 0.0
+        # Special case: uninformative rules (cover everything - all positives AND all negatives)
+        # These don't discriminate: TP=all positives, FP=all negatives, FN=0, TN=0
+        if TP > 0 and FN == 0 and TN == 0 and FP == len(negative_examples) and FP > 0:
+            uninformative_penalty = 0.9
         else:
-            accuracy = score_pos * score_neg
-            reward = (0.9 * accuracy +
-                0.1 * simplicity -
-                uninformative_penalty -
-                disconnected_penalty_value -
-                self_loop_penalty_value -
-                free_var_penalty_value)
+            uninformative_penalty = 0.0
+
+        # Calculate reward based on mode
+        if self.use_f1:
+            # Use F1-score as primary metric (harmonic mean)
+            reward = (f1_score +
+                     self.weight_simplicity * simplicity -
+                     uninformative_penalty -
+                     disconnected_penalty_value -
+                     self_loop_penalty_value -
+                     free_var_penalty_value)
+        else:
+            # Use weighted precision + recall (more flexible)
+            reward = (self.weight_precision * precision +
+                     self.weight_recall * recall +
+                     self.weight_simplicity * simplicity -
+                     uninformative_penalty -
+                     disconnected_penalty_value -
+                     self_loop_penalty_value -
+                     free_var_penalty_value)
+
+        # Ensure minimum reward for numerical stability (avoid log(0) in GFlowNet)
+        return max(reward, 1e-6)
+
+    def get_detailed_scores(self, theory: Theory,
+                           positive_examples: List[Example],
+                           negative_examples: List[Example]) -> dict:
+        """
+        Get detailed breakdown of reward components with full confusion matrix.
+        Uses the SAME formula as calculate_reward() for consistency.
+        """
+        # Compute confusion matrix
+        TP = sum(1 for ex in positive_examples if self.logic_engine.entails(theory, ex))
+        FN = len(positive_examples) - TP
+        FP = sum(1 for ex in negative_examples if self.logic_engine.entails(theory, ex))
+        TN = len(negative_examples) - FP
+
+        # Compute precision and recall
+        if TP + FP > 0:
+            precision = TP / (TP + FP)
+        else:
+            precision = 0.0
+
+        if TP + FN > 0:
+            recall = TP / (TP + FN)
+        else:
+            recall = 0.0
+
+        # Compute F1-score
+        if precision + recall > 0:
+            f1_score = 2 * (precision * recall) / (precision + recall)
+        else:
+            f1_score = 0.0
+
+        # Compute accuracy
+        total = TP + TN + FP + FN
+        if total > 0:
+            accuracy = (TP + TN) / total
+        else:
+            accuracy = 0.0
+
+        # Simplicity
+        total_atoms = sum(len(rule.body) for rule in theory)
+        simplicity = 1.0 / (1.0 + total_atoms)
+
+        # Structural penalties
+        num_disconnected = self._count_disconnected_variables(theory)
+        num_self_loops = self._count_self_loops(theory)
+        num_free_vars = self._count_free_variables(theory)
+
+        disconnected_penalty_value = self.disconnected_var_penalty * num_disconnected
+        self_loop_penalty_value = self.self_loop_penalty * num_self_loops
+        free_var_penalty_value = self.free_var_penalty * num_free_vars
+
+        # Special case: uninformative rules
+        if TP > 0 and FN == 0 and TN == 0 and FP == len(negative_examples) and FP > 0:
+            uninformative_penalty = 0.9
+        else:
+            uninformative_penalty = 0.0
+
+        # Calculate reward (SAME formula as calculate_reward)
+        if self.use_f1:
+            reward = (f1_score +
+                     self.weight_simplicity * simplicity -
+                     uninformative_penalty -
+                     disconnected_penalty_value -
+                     self_loop_penalty_value -
+                     free_var_penalty_value)
+        else:
+            reward = (self.weight_precision * precision +
+                     self.weight_recall * recall +
+                     self.weight_simplicity * simplicity -
+                     uninformative_penalty -
+                     disconnected_penalty_value -
+                     self_loop_penalty_value -
+                     free_var_penalty_value)
 
         return {
             'reward': max(reward, 1e-6),
-            'pos_covered': pos_covered,
-            'pos_total': len(positive_examples),
-            'pos_score': score_pos,
-            'neg_covered': neg_covered,
-            'neg_total': len(negative_examples),
-            'neg_score': score_neg,
+            # Confusion matrix
+            'TP': TP,
+            'FP': FP,
+            'TN': TN,
+            'FN': FN,
+            # Derived metrics
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1_score,
+            'accuracy': accuracy,
+            # Weighted components
+            'precision_weighted': self.weight_precision * precision,
+            'recall_weighted': self.weight_recall * recall,
+            # Simplicity
             'total_atoms': total_atoms,
             'simplicity': simplicity,
+            'simplicity_weighted': self.weight_simplicity * simplicity,
+            # Penalties
             'uninformative_penalty': uninformative_penalty,
-            'accuracy': accuracy,
             'num_disconnected_vars': num_disconnected,
             'disconnected_penalty': disconnected_penalty_value,
             'num_self_loops': num_self_loops,

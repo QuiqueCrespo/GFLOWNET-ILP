@@ -70,23 +70,25 @@ def get_initial_state(target_predicate: str, arity: int) -> Theory:
     return [Rule(head=head, body=[])]
 
 
-def is_terminal(theory: Theory) -> bool:
+def is_valid_complete_state(theory: Theory) -> bool:
     """
-    Check if the theory is in a terminal state.
+    Check if the theory is valid and complete (potentially terminal).
 
-    A theory is terminal if:
-    1. It has reached maximum body length (3 atoms), OR
-    2. All head variables appear in the body (no free variables)
+    A state is valid and complete if:
+    - All head variables appear in the body (no free variables)
+    - Has at least one body atom
 
-    A theory is NOT terminal if:
-    - It has free variables in the head (must continue adding atoms)
+    This means the policy CAN choose to terminate at this state,
+    but is not forced to - it can continue adding more atoms.
     """
     if not theory:
         return False
 
     rule = theory[0]
 
-
+    # Must have at least one body atom
+    if len(rule.body) == 0:
+        return False
 
     # Check for free variables in head
     head_vars = set(arg for arg in rule.head.args if isinstance(arg, Variable))
@@ -99,16 +101,31 @@ def is_terminal(theory: Theory) -> bool:
 
     free_vars = head_vars - body_vars
 
+    # Valid and complete if no free variables
+    return len(free_vars) == 0
 
-    # NOT terminal if there are free variables (must continue)
-    # Even at max body length, allow unification to resolve free variables
-    # The action mask in training.py will prevent ADD_ATOM at max length
-    if free_vars:
-        return False  # Not terminal, must continue to resolve free vars
 
-    # No free variables - valid rule
-    # Terminal if max body length reached OR if we have at least one body atom
-    return len(rule.body) >= 3 or len(rule.body) > 0
+def is_terminal(theory: Theory) -> bool:
+    """
+    Check if the theory is in a terminal state (trajectory must stop).
+
+    A theory is FORCED to be terminal if:
+    1. It has reached maximum body length (checked in training loop), OR
+    2. The policy explicitly chose TERMINATE action
+
+    NOTE: This function is used in the main training loop to check
+    if we should stop trajectory generation. The actual termination
+    is controlled by:
+    - Max body length constraint (action masking)
+    - Policy choosing TERMINATE action
+
+    For compatibility, returns True if state is valid and complete,
+    but the policy should use is_valid_complete_state() to decide
+    if TERMINATE is allowed.
+    """
+    # For backward compatibility and loop termination
+    # This should rarely be called now since we rely on policy TERMINATE
+    return is_valid_complete_state(theory)
 
 
 def apply_add_atom(theory: Theory, predicate_name: str, arity: int,
