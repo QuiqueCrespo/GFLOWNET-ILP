@@ -3,7 +3,7 @@ Reward function for evaluating generated theories.
 """
 
 from typing import List
-from .logic_structures import Theory
+from .logic_structures import Theory, Variable # <--- ADD THIS IMPORT
 from .logic_engine import LogicEngine, Example
 
 
@@ -80,30 +80,26 @@ class RewardCalculator:
             return 0
 
         rule = theory[0]
-        head_vars = set(rule.head.args)
+        head_vars = set(arg for arg in rule.head.args if isinstance(arg, Variable))
 
         # Build connected component starting from head variables
         connected_vars = set(head_vars)
-        changed = True
-
-        while changed:
-            changed = False
+        
+        # Use a queue for a breadth-first search of connected variables
+        queue = list(head_vars)
+        
+        while queue:
+            current_var = queue.pop(0)
             for atom in rule.body:
-                atom_vars = set(arg for arg in atom.args
-                              if hasattr(arg, '__class__') and arg.__class__.__name__ == 'Variable')
-                # If atom shares any variable with connected component, add all its variables
-                if atom_vars & connected_vars:
-                    new_vars = atom_vars - connected_vars
-                    if new_vars:
-                        connected_vars.update(new_vars)
-                        changed = True
+                atom_vars = {arg for arg in atom.args if isinstance(arg, Variable)}
+                if current_var in atom_vars:
+                    for var in atom_vars:
+                        if var not in connected_vars:
+                            connected_vars.add(var)
+                            queue.append(var)
 
         # Count variables that are not in the connected component
-        all_body_vars = set()
-        for atom in rule.body:
-            for arg in atom.args:
-                if hasattr(arg, '__class__') and arg.__class__.__name__ == 'Variable':
-                    all_body_vars.add(arg)
+        all_body_vars = {arg for atom in rule.body for arg in atom.args if isinstance(arg, Variable)}
 
         disconnected = all_body_vars - connected_vars
         return len(disconnected)
@@ -142,13 +138,12 @@ class RewardCalculator:
             return 0
 
         rule = theory[0]
-        head_vars = set(arg for arg in rule.head.args
-                       if hasattr(arg, '__class__') and arg.__class__.__name__ == 'Variable')
+        head_vars = {arg for arg in rule.head.args if isinstance(arg, Variable)}
 
         body_vars = set()
         for atom in rule.body:
             for arg in atom.args:
-                if hasattr(arg, '__class__') and arg.__class__.__name__ == 'Variable':
+                if isinstance(arg, Variable):
                     body_vars.add(arg)
 
         free_vars = head_vars - body_vars

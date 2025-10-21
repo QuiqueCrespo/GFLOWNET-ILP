@@ -1,0 +1,18 @@
+{
+  "problem": "grandparent",
+  "num_episodes": 1000,
+  "embedding_dim": 32,
+  "hidden_dim": 64,
+  "learning_rate": 0.0001,
+  "max_body_length": 4,
+  "use_sophisticated_backward": true,
+  "use_f1": true,
+  "weight_precision": 0.5,
+  "weight_recall": 0.5,
+  "use_detailed_balance": true,
+  "use_replay_buffer": true,
+  "replay_buffer_capacity": 50,
+  "num_background_facts": 7,
+  "num_positive_examples": 4,
+  "num_negative_examples": 5
+}

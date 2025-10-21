@@ -1,0 +1,103 @@
+Top 20 Rules Discovered
+================================================================================
+
+Rule 1: (Reward: 1.0100, Episode: 5170)
+grandparent(X6, X5) :- parent(X6, X8), parent(X8, X5), parent(X6, X7), parent(X8, X9).
+  TP=4, FP=0, TN=5, FN=0
+  Precision=1.000, Recall=1.000, F1=1.000
+
+Rule 2: (Reward: 1.0100, Episode: 5320)
+grandparent(X6, X5) :- parent(X6, X7), parent(X4, X5), parent(X6, X7), parent(X8, X4).
+  TP=4, FP=0, TN=5, FN=0
+  Precision=1.000, Recall=1.000, F1=1.000
+
+Rule 3: (Reward: 0.7373, Episode: 5610)
+grandparent(X8, X1) :- parent(X2, X1), parent(X6, X5), parent(X6, X5), parent(X8, X5).
+  TP=4, FP=3, TN=2, FN=0
+  Precision=0.571, Recall=1.000, F1=0.727
+
+Rule 4: (Reward: 0.6125, Episode: 5490)
+grandparent(X0, X5) :- parent(X0, X4), parent(X4, X5), parent(X6, X7).
+  TP=4, FP=0, TN=5, FN=0
+  Precision=1.000, Recall=1.000, F1=1.000
+
+Rule 5: (Reward: 0.4100, Episode: 4130)
+grandparent(X0, X1) :- parent(X2, X0), parent(X8, X5), parent(X6, X8), parent(X8, X1).
+  TP=1, FP=0, TN=5, FN=3
+  Precision=1.000, Recall=0.250, F1=0.400
+
+Rule 6: (Reward: 0.4100, Episode: 4460)
+grandparent(X2, X1) :- parent(X2, X6), parent(X4, X6), parent(X6, X1), parent(X8, X2).
+  TP=1, FP=0, TN=5, FN=3
+  Precision=1.000, Recall=0.250, F1=0.400
+
+Rule 7: (Reward: 0.3433, Episode: 6760)
+grandparent(X8, X4) :- parent(X2, X6), parent(X4, X5), parent(X6, X7), parent(X8, X2).
+  TP=1, FP=1, TN=4, FN=3
+  Precision=0.500, Recall=0.250, F1=0.333
+
+Rule 8: (Reward: 0.3398, Episode: 1730)
+grandparent(X4, X1) :- parent(X2, X1), parent(X4, X5), parent(X6, X7).
+  TP=4, FP=3, TN=2, FN=0
+  Precision=0.571, Recall=1.000, F1=0.727
+
+Rule 9: (Reward: 0.3398, Episode: 4440)
+grandparent(X4, X1) :- parent(X2, X3), parent(X4, X5), parent(X6, X1).
+  TP=4, FP=3, TN=2, FN=0
+  Precision=0.571, Recall=1.000, F1=0.727
+
+Rule 10: (Reward: 0.3373, Episode: 280)
+grandparent(X8, X5) :- parent(X2, X5), parent(X4, X5), parent(X6, X7), parent(X8, X9).
+  TP=4, FP=3, TN=2, FN=0
+  Precision=0.571, Recall=1.000, F1=0.727
+
+Rule 11: (Reward: 0.3373, Episode: 6290)
+grandparent(X4, X1) :- parent(X2, X1), parent(X4, X5), parent(X6, X1), parent(X8, X9).
+  TP=4, FP=3, TN=2, FN=0
+  Precision=0.571, Recall=1.000, F1=0.727
+
+Rule 12: (Reward: 0.3024, Episode: 50)
+grandparent(X5, X1) :- parent(X2, X1), parent(X4, X5).
+  TP=1, FP=2, TN=3, FN=3
+  Precision=0.333, Recall=0.250, F1=0.286
+
+Rule 13: (Reward: 0.3024, Episode: 3330)
+grandparent(X5, X1) :- parent(X2, X1), parent(X4, X5).
+  TP=1, FP=2, TN=3, FN=3
+  Precision=0.333, Recall=0.250, F1=0.286
+
+Rule 14: (Reward: 0.3024, Episode: 3620)
+grandparent(X5, X1) :- parent(X2, X1), parent(X4, X5).
+  TP=1, FP=2, TN=3, FN=3
+  Precision=0.333, Recall=0.250, F1=0.286
+
+Rule 15: (Reward: 0.3024, Episode: 4800)
+grandparent(X5, X1) :- parent(X2, X1), parent(X4, X5).
+  TP=1, FP=2, TN=3, FN=3
+  Precision=0.333, Recall=0.250, F1=0.286
+
+Rule 16: (Reward: 0.2167, Episode: 6240)
+grandparent(X4, X1) :- parent(X1, X3), parent(X4, X5).
+  TP=1, FP=5, TN=0, FN=3
+  Precision=0.167, Recall=0.250, F1=0.200
+
+Rule 17: (Reward: 0.2167, Episode: 9150)
+grandparent(X2, X4) :- parent(X2, X3), parent(X4, X5).
+  TP=1, FP=5, TN=0, FN=3
+  Precision=0.167, Recall=0.250, F1=0.200
+
+Rule 18: (Reward: 0.2125, Episode: 130)
+grandparent(X6, X2) :- parent(X2, X5), parent(X4, X5), parent(X6, X7).
+  TP=1, FP=5, TN=0, FN=3
+  Precision=0.167, Recall=0.250, F1=0.200
+
+Rule 19: (Reward: 0.2100, Episode: 4860)
+grandparent(X6, X2) :- parent(X2, X5), parent(X2, X5), parent(X6, X7), parent(X8, X7).
+  TP=1, FP=5, TN=0, FN=3
+  Precision=0.167, Recall=0.250, F1=0.200
+
+Rule 20: (Reward: 0.2100, Episode: 6140)
+grandparent(X2, X6) :- parent(X2, X3), parent(X6, X5), parent(X6, X7), parent(X8, X3).
+  TP=1, FP=5, TN=0, FN=3
+  Precision=0.167, Recall=0.250, F1=0.200
+

@@ -94,7 +94,7 @@ class VariableUnifierGFlowNet(nn.Module):
             variable_embeddings: [num_vars, embedding_dim] - embeddings for each variable
 
         Returns:
-            pair_logits: [num_pairs] - logits for each valid variable pair
+            pair_log_probs: [num_pairs] - log probabilities for each valid variable pair
         """
         num_vars = variable_embeddings.size(0)
 
@@ -112,14 +112,19 @@ class VariableUnifierGFlowNet(nn.Module):
         keys = keys + context.unsqueeze(0)
 
         # Compute attention scores for all pairs (i, j) where i < j
-        pair_logits = []
+        pair_scores = []
         for i in range(num_vars):
             for j in range(i + 1, num_vars):
                 # Score for unifying variable i and j
                 score = torch.dot(queries[i], keys[j])
-                pair_logits.append(score)
+                pair_scores.append(score)
+        
+        if not pair_scores:
+            return torch.tensor([], dtype=torch.float)
 
-        return torch.stack(pair_logits) if pair_logits else torch.tensor([], dtype=torch.float)
+        # Convert scores to log probabilities
+        pair_scores_tensor = torch.stack(pair_scores)
+        return F.log_softmax(pair_scores_tensor, dim=-1)
 
     def get_pair_indices(self, num_vars: int) -> List[Tuple[int, int]]:
         """Get list of (i, j) pairs where i < j."""

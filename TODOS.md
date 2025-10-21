@@ -1,4 +1,4 @@
 # To do's
-- Explore why it is still allowing rules with free variables in the head of the rule.
-- Set up the pipeline to test this approach with the datasets from popper
-- If that works set up the pipeline to encode de apperception engine and sample theories, first in an batch solving fashion and then incrementallly.
+- Analyse the graph embedings, take a trained dflownet, take the graph embeding function and test it with diferent possible rules, longer shorter, same but renaming varibales, swapping the order of the predicates, rules with repeted predicates, and so on, then check the embeding and verify that the ones with the same semantic meaning have the same enmbedings but rules with diferent semantaic meaning by similar sintax are diferent.
+- Visualise the trained gflownet by ploting a graphs with nodes being the rules in construction and edges being the actions with their probabiltiy,
+- Analyse the missmatch between the loss function and the reward, the loss function is minimized but the sampling does not managed to find good rules, always zero reward. I is likeky that that is is learning to assing zero flow every where
