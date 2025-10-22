@@ -113,8 +113,11 @@ class LossRewardAnalyzer:
         # Store gradients
         gradient_norms = defaultdict(list)
 
+        # Clear any existing gradients first
+        self.trainer.optimizer.zero_grad()
+
         for i in range(num_samples):
-            # Generate trajectory
+            # Generate trajectory (creates fresh computational graph)
             trajectory, reward = self.trainer.generate_trajectory(
                 states['initial'],
                 states['positives'],
@@ -124,14 +127,14 @@ class LossRewardAnalyzer:
             if not trajectory:
                 continue
 
-            # Compute loss
+            # Compute loss (fresh computational graph)
             loss = self.trainer.compute_trajectory_balance_loss(trajectory, reward)
 
-            # Zero gradients
+            # Zero gradients before backward
             self.trainer.optimizer.zero_grad()
 
-            # Backward pass
-            loss.backward()
+            # Backward pass (don't retain graph since we won't use it again)
+            loss.backward(retain_graph=False)
 
             # Collect gradient norms for each parameter
             for name, param in self.trainer.gflownet.named_parameters():
@@ -139,19 +142,28 @@ class LossRewardAnalyzer:
                     grad_norm = param.grad.norm().item()
                     gradient_norms[name].append(grad_norm)
 
+            # Also collect for state_encoder
+            for name, param in self.trainer.state_encoder.named_parameters():
+                if param.grad is not None:
+                    grad_norm = param.grad.norm().item()
+                    gradient_norms[f'encoder.{name}'].append(grad_norm)
+
             # Also collect for log_Z
             if self.trainer.log_Z.grad is not None:
                 gradient_norms['log_Z'].append(self.trainer.log_Z.grad.norm().item())
 
+            # Clear gradients after collection to free memory
+            self.trainer.optimizer.zero_grad()
+
         if not gradient_norms:
             print("\n✗ No gradients collected!")
-            return
+            return {}
 
         # Analyze
         print(f"\nGradient norms (averaged over {num_samples} samples):\n")
 
         vanishing_grads = []
-        for name, norms in gradient_norms.items():
+        for name, norms in sorted(gradient_norms.items()):
             mean_norm = np.mean(norms)
             std_norm = np.std(norms)
 

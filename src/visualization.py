@@ -79,7 +79,7 @@ class TrainingVisualizer:
             metrics: Dictionary containing episode metrics
         """
         self.metrics_history['episodes'].append(episode)
-        self.metrics_history['rewards'].append(metrics.get('reward', 0))
+        self.metrics_history['rewards'].append(metrics.get('on_policy_reward', 0))
         self.metrics_history['losses'].append(metrics.get('loss', 0))
         self.metrics_history['trajectory_lengths'].append(
             metrics.get('trajectory_length', 0)

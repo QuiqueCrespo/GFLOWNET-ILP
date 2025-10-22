@@ -116,6 +116,7 @@ class GFlowNetTrainer:
         self.use_replay_buffer = use_replay_buffer
         self.replay_probability = replay_probability
         self.buffer_reward_threshold = buffer_reward_threshold
+        self.freeze_encoder = False  # Option to freeze encoder during training
 
         self.embedding_cache = {}  # Cache for state embeddings
 
@@ -135,9 +136,17 @@ class GFlowNetTrainer:
         self.reward_cache = {}  # Key: theory_to_string(state), Value: reward
 
         # Optimizer
-        all_params = (list(state_encoder.parameters()) +
-                     list(gflownet.parameters()) +
-                     [self.log_Z])
+        if self.freeze_encoder:
+            all_params = (
+                list(gflownet.parameters()) +
+                [self.log_Z]
+            )
+        else:
+            all_params = (
+                list(state_encoder.parameters()) +
+                list(gflownet.parameters()) +
+                [self.log_Z]
+            )
         self.optimizer = torch.optim.Adam(all_params, lr=learning_rate)
     def _recompute_step_log_pf(self, state: Theory, action_type: str, action_detail: any) -> torch.Tensor:
         """
@@ -178,26 +187,42 @@ class GFlowNetTrainer:
 
         elif action_type == 'UNIFY_VARIABLES':
             valid_pairs = get_valid_variable_pairs(state)
-            if not valid_pairs or len(get_all_variables(state)) < 2:
+            variables = get_all_variables(state)
+            num_vars = len(variables)
+
+            if not valid_pairs or num_vars < 2:
                 return torch.tensor(-1e6) 
 
-            var_embeddings = node_embeddings[:len(get_all_variables(state))]
+            var_embeddings = node_embeddings[:num_vars]
             pair_logits = self.gflownet.forward_variable_unifier(state_embedding, var_embeddings)
-            pair_probs = F.softmax(pair_logits, dim=-1)
 
-            chosen_pair = action_detail
+            # --- Apply mask to get correct probabilities ---
+            var_to_idx = {var.id: i for i, var in enumerate(variables)}
+            all_scored_pairs = self.gflownet.variable_unifier.get_pair_indices(num_vars)
+            masked_logits = torch.full_like(pair_logits, float('-inf'))
+            valid_pair_ids_set = {tuple(sorted((v1.id, v2.id))) for v1, v2 in valid_pairs}
+
+            logit_idx_map = {} # Maps (v_id1, v_id2) -> logit_idx
+            for logit_idx, (var_i_idx, var_j_idx) in enumerate(all_scored_pairs):
+                var_i = variables[var_i_idx]
+                var_j = variables[var_j_idx]
+                pair_ids = tuple(sorted((var_i.id, var_j.id)))
+
+                if pair_ids in valid_pair_ids_set:
+                    masked_logits[logit_idx] = pair_logits[logit_idx]
+                    logit_idx_map[pair_ids] = logit_idx
+            # --- End Masking ---
+
+            pair_probs = F.softmax(masked_logits, dim=-1) # Probabilities over *valid* actions
+
+            chosen_pair = action_detail # This is (var1, var2)
             chosen_pair_ids = tuple(sorted((chosen_pair[0].id, chosen_pair[1].id)))
-            
-            pair_idx = -1
-            for i, (v1, v2) in enumerate(valid_pairs):
-                if tuple(sorted((v1.id, v2.id))) == chosen_pair_ids:
-                    pair_idx = i
-                    break
-            
-            if pair_idx != -1:
+
+            if chosen_pair_ids in logit_idx_map:
+                pair_idx = logit_idx_map[chosen_pair_ids]
                 log_prob_detail = torch.log(pair_probs[pair_idx] + 1e-10)
             else:
-                return torch.tensor(-1e6) 
+                return torch.tensor(-1e6) # Action was not valid
 
         elif action_type == 'TERMINATE':
             # --- FIX: Explicitly handle TERMINATE ---
@@ -310,7 +335,7 @@ class GFlowNetTrainer:
 
     def _get_state_embeddings(self, state_key: str, current_state: Theory):
         """Gets state embeddings, using cache if available."""
-        if state_key in self.embedding_cache:
+        if self.freeze_encoder and state_key in self.embedding_cache:
             return self.embedding_cache[state_key]
         
         # Not in cache, compute
@@ -319,7 +344,8 @@ class GFlowNetTrainer:
         state_embedding = state_embedding.squeeze(0)  # Remove batch dim
         
         # Cache for potential reuse
-        self.embedding_cache[state_key] = (state_embedding, node_embeddings)
+        if self.freeze_encoder:
+            self.embedding_cache[state_key] = (state_embedding, node_embeddings)
         return state_embedding, node_embeddings
 
     def _get_masked_strategist_logits(self, state_embedding, current_state: Theory,
@@ -357,6 +383,10 @@ class GFlowNetTrainer:
             logits[0] = float('-inf')  # Mask ADD_ATOM
             logits[1] = float('-inf')  # Mask UNIFY_VARIABLES
             # Note: Mask 2 (TERMINATE) is *not* applied, allowing it
+
+        # 5. Add mask to the UNIFY_VARIABLES when there are no body atoms
+        if current_state[0].body == []:
+            logits[1] = float('-inf')
             
         return logits
 
@@ -394,20 +424,52 @@ class GFlowNetTrainer:
     def _handle_action_unify_vars(self, state_embedding, node_embeddings, 
                                   current_state: Theory, valid_pairs: list):
         """Handles the UNIFY_VARIABLES action logic."""
+        """Handles the UNIFY_VARIABLES action logic."""
         variables = get_all_variables(current_state)
-        # var_to_node = self.graph_constructor.get_variable_node_ids(current_state) # Assumed used by unifier
-        var_embeddings = node_embeddings[:len(variables)]
+        num_vars = len(variables)
+        var_embeddings = node_embeddings[:num_vars]
 
-        pair_logits = self.gflownet.forward_variable_unifier(
+        # Get logits for ALL N*(N-1)/2 pairs
+        all_pair_logits = self.gflownet.forward_variable_unifier(
             state_embedding, var_embeddings
         )
 
-        pair_idx, log_prob_detail = self._sample_action_from_logits(pair_logits)
+        # Get the mapping from logit index to variable IDs
+        # Assumes variables are sorted by ID or {var.id: i for i, var in enumerate(variables)}
+        var_to_idx = {var.id: i for i, var in enumerate(variables)}
+        all_scored_pairs = self.gflownet.variable_unifier.get_pair_indices(num_vars)
 
-        var1, var2 = valid_pairs[pair_idx]
+        # Create a mask, initializing all logits to -inf
+        masked_logits = torch.full_like(all_pair_logits, float('-inf'))
+
+        # Create a map from the logit_index to the corresponding (var1, var2) tuple
+        logit_idx_to_action = {}
+
+        # Create a set of valid pairs (by ID) for fast lookup
+        valid_pair_ids_set = {tuple(sorted((v1.id, v2.id))) for v1, v2 in valid_pairs}
+
+        for logit_idx, (var_i_idx, var_j_idx) in enumerate(all_scored_pairs):
+            var_i = variables[var_i_idx]
+            var_j = variables[var_j_idx]
+
+            pair_ids = tuple(sorted((var_i.id, var_j.id)))
+
+            if pair_ids in valid_pair_ids_set:
+                # This logit corresponds to a valid action. Unmask it.
+                masked_logits[logit_idx] = all_pair_logits[logit_idx]
+                # Store the actual Variable objects for this action
+                logit_idx_to_action[logit_idx] = (var_i, var_j)
+
+        # Sample from the *masked* logits
+        pair_idx_from_all, log_prob_detail = self._sample_action_from_logits(masked_logits)
+
+        # Get the chosen action (var1, var2)
+        # pair_idx_from_all is the *index in the full logit tensor*
+        var1, var2 = logit_idx_to_action[pair_idx_from_all] 
+
         next_state = apply_unify_vars(current_state, var1, var2)
         action_detail = ('UNIFY_VARIABLES', (var1, var2))
-        
+
         return next_state, action_detail, log_prob_detail
 
     def _handle_action_terminate(self, current_state: Theory):
@@ -498,13 +560,20 @@ class GFlowNetTrainer:
 
             # Encode next state to get its embedding
             graph_data_next = self.graph_constructor.theory_to_graph(step.next_state)
-            next_state_embedding, node_embeddings = self.state_encoder(graph_data_next)
+            next_state_embedding, next_node_embeddings = self.state_encoder(graph_data_next)
             next_state_embedding = next_state_embedding.squeeze(0)
 
-            # Get variable embeddings if needed for sophisticated backward policy
-            
-            variables = get_all_variables(step.next_state)
-            var_embeddings = node_embeddings[:len(variables)] if len(variables) > 0 else None
+            # For UNIFY_VARIABLES, we also need embeddings from PREVIOUS state
+            # since the backward policy needs to predict which pair in prev_state was unified
+            prev_var_embeddings = None
+            if step.action_type == 'UNIFY_VARIABLES':
+                # Encode previous state to get variable embeddings
+                graph_data_prev = self.graph_constructor.theory_to_graph(step.state)
+                _, prev_node_embeddings = self.state_encoder(graph_data_prev)
+
+                # Extract variable embeddings from previous state
+                prev_variables = get_all_variables(step.state)
+                prev_var_embeddings = prev_node_embeddings[:len(prev_variables)] if len(prev_variables) > 0 else None
 
             # Get log probability of backward transition from next_state to state
             log_pb_step = self.gflownet.get_backward_log_probability(
@@ -513,7 +582,7 @@ class GFlowNetTrainer:
                 step.state,
                 step.action_type,
                 step.action_detail,
-                var_embeddings
+                prev_var_embeddings  # Now passing prev_var_embeddings for UNIFY
             )
             sum_log_pb = sum_log_pb + log_pb_step
 
@@ -574,9 +643,16 @@ class GFlowNetTrainer:
 
             # Backward probability: P_B(s'->s)
             # The backward policy gives the probability of going back from next_state to state
-            # Get variable embeddings for sophisticated backward policy
-            variables = get_all_variables(step.next_state)
-            var_embeddings = node_embeddings_next[:len(variables)] if len(variables) > 0 else None
+            # For UNIFY_VARIABLES, we need embeddings from PREVIOUS state
+            prev_var_embeddings = None
+            if step.action_type == 'UNIFY_VARIABLES':
+                # Encode previous state to get variable embeddings
+                graph_data_prev = self.graph_constructor.theory_to_graph(step.state)
+                _, prev_node_embeddings = self.state_encoder(graph_data_prev)
+
+                # Extract variable embeddings from previous state
+                prev_variables = get_all_variables(step.state)
+                prev_var_embeddings = prev_node_embeddings[:len(prev_variables)] if len(prev_variables) > 0 else None
 
             log_pb = self.gflownet.get_backward_log_probability(
                 next_state_embedding,
@@ -584,7 +660,7 @@ class GFlowNetTrainer:
                 step.state,
                 step.action_type,
                 step.action_detail,
-                var_embeddings
+                prev_var_embeddings  # Now passing prev_var_embeddings for UNIFY
             )
             log_backward = log_F_s_next + log_pb
 
@@ -608,51 +684,23 @@ class GFlowNetTrainer:
         """
         Perform one training step, correctly handling on-policy and off-policy (replay) data.
         """
-        # --- On-Policy Step ---
-        # Generate a new trajectory using the current policy
-        on_policy_trajectory, on_policy_reward = self.generate_trajectory(
-            initial_state, positive_examples, negative_examples
-        )
-
-        self.embedding_cache.clear()
-
-        if not on_policy_trajectory:
-            return {'loss': 0.0, 'reward': on_policy_reward, 'trajectory_length': 0}
-
-        # Add high-reward trajectories to the replay buffer
-        if self.replay_buffer is not None and on_policy_reward > self.buffer_reward_threshold:
-            self.replay_buffer.add(on_policy_trajectory, on_policy_reward)
-
-        # Calculate the loss for the new (on-policy) trajectory
-        if self.use_detailed_balance:
-            total_loss = self.compute_detailed_balance_loss(on_policy_trajectory, on_policy_reward)
-        else:
-            total_loss = self.compute_trajectory_balance_loss(on_policy_trajectory, on_policy_reward)
-
+        
         metrics_info = {'replay_used': False}
 
         # --- Off-Policy Step (Replay Buffer) ---
         use_replay = (self.replay_buffer is not None and
                      len(self.replay_buffer) > 0 and
                      random.random() < self.replay_probability)
+
+        if self.freeze_encoder: 
+            self.embedding_cache.clear()
         
         if use_replay:
+
+            
             replayed_trajectory, replay_reward = self.replay_buffer.sample(1)[0]
             
-            # **FIX:** Re-compute log probabilities for the replayed trajectory
-            # using the current model. This is crucial for off-policy training.
-            recomputed_log_pf_sum = torch.tensor(0.0)
-            for step in replayed_trajectory:
-                recomputed_log_pf_sum += self._recompute_step_log_pf(
-                    step.state, step.action_type, step.action_detail
-                )
-
-            # Create a temporary trajectory object with a single summed log_pf for the loss function
-            # This avoids creating a whole new list of TrajectoryStep objects.
-            # NOTE: This assumes loss functions only need the sum of log_pf and the reward.
-            # If they need more, this approach needs to be adjusted.
-            
-            # To make it work with your current loss functions, we'll build a new trajectory list.
+            # Re-compute log probabilities for the replayed trajectory
             recomputed_trajectory_for_loss = [
                 TrajectoryStep(s.state, s.action_type, s.action_detail, self._recompute_step_log_pf(s.state, s.action_type, s.action_detail), s.next_state)
                 for s in replayed_trajectory
@@ -664,12 +712,35 @@ class GFlowNetTrainer:
                 off_policy_loss = self.compute_trajectory_balance_loss(recomputed_trajectory_for_loss, replay_reward)
 
             # Add the off-policy loss to the total loss for a combined gradient update
-            total_loss += off_policy_loss
+            total_loss = off_policy_loss
             metrics_info = {'replay_used': True, 'replay_reward': replay_reward}
+            on_policy_reward = np.nan
+            on_policy_trajectory = []
+
+        else:
+            # --- On-Policy Step ---
+            # Generate a new trajectory using the current policy
+            on_policy_trajectory, on_policy_reward = self.generate_trajectory(
+                initial_state, positive_examples, negative_examples
+            )
+
+            if not on_policy_trajectory:
+                return {'loss': 0.0, 'reward': on_policy_reward, 'trajectory_length': 0}
+
+            # Add high-reward trajectories to the replay buffer
+            if self.replay_buffer is not None and on_policy_reward > self.buffer_reward_threshold:
+                self.replay_buffer.add(on_policy_trajectory, on_policy_reward)
+
+            # Calculate the loss for the new (on-policy) trajectory
+            if self.use_detailed_balance:
+                total_loss = self.compute_detailed_balance_loss(on_policy_trajectory, on_policy_reward)
+            else:
+                total_loss = self.compute_trajectory_balance_loss(on_policy_trajectory, on_policy_reward)
 
         # Apply exploration strategy modifications to the final combined loss
         if self.exploration_strategy:
             total_loss = self.exploration_strategy.modify_loss(total_loss)
+
 
         # --- Optimization ---
         # Perform a SINGLE backward pass on the combined loss
@@ -684,7 +755,7 @@ class GFlowNetTrainer:
 
         metrics = {
             'loss': total_loss.item(),
-            'reward': on_policy_reward,
+            'on_policy_reward': on_policy_reward,
             'trajectory_length': len(on_policy_trajectory),
             'log_Z': self.log_Z.item()
         }

@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Dict, List, Tuple
 
-from .logic_structures import Variable
+from .logic_structures import get_valid_variable_pairs
 
 
 class StrategistGFlowNet(nn.Module):
@@ -124,7 +124,8 @@ class VariableUnifierGFlowNet(nn.Module):
 
         # Convert scores to log probabilities
         pair_scores_tensor = torch.stack(pair_scores)
-        return F.log_softmax(pair_scores_tensor, dim=-1)
+        return pair_scores_tensor
+    
 
     def get_pair_indices(self, num_vars: int) -> List[Tuple[int, int]]:
         """Get list of (i, j) pairs where i < j."""
@@ -222,49 +223,79 @@ class BackwardAtomRemover(nn.Module):
 class BackwardVariableSplitter(nn.Module):
     """
     Backward variable splitter that predicts which variables were unified to reach current state.
-    Given state s', predicts which pair of variables existed before unification.
+    Given next_state s' and previous_state s, predicts which pair of variables in s were unified.
+
+    Uses pairwise attention over variables in the previous state to score all possible pairs.
     """
 
     def __init__(self, embedding_dim: int, hidden_dim: int = 128):
         super().__init__()
 
-        # Query and key projections for attention
+        # Query and key projections for pairwise attention
         self.query_net = nn.Linear(embedding_dim, hidden_dim)
         self.key_net = nn.Linear(embedding_dim, hidden_dim)
 
-        # Additional transformation for state context
+        # State context conditioning
         self.context_net = nn.Sequential(
             nn.Linear(embedding_dim, hidden_dim),
             nn.ReLU()
         )
 
-    def forward(self, state_embedding: torch.Tensor,
-                variable_embeddings: torch.Tensor) -> torch.Tensor:
+        # MLP to score variable pairs based on their interaction
+        self.pair_scorer = nn.Sequential(
+            nn.Linear(hidden_dim * 2, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 1)
+        )
+
+    def forward(self, next_state_embedding: torch.Tensor,
+                prev_variable_embeddings: torch.Tensor) -> torch.Tensor:
         """
+        Compute logits for all possible variable pairs in the previous state.
+
         Args:
-            state_embedding: [embedding_dim] - global state representation
-            variable_embeddings: [num_vars, embedding_dim] - embeddings for each variable
+            next_state_embedding: [embedding_dim] - embedding of next state (after unification)
+            prev_variable_embeddings: [num_prev_vars, embedding_dim] - embeddings of variables
+                                      in the PREVIOUS state (before unification)
 
         Returns:
-            pair_logits: [num_vars] - logits for each variable being the unified one
+            pair_logits: [num_pairs] - logits for each possible pair (i, j) where i < j
+                         Returns empty tensor if num_prev_vars < 2
         """
-        num_vars = variable_embeddings.size(0)
+        num_vars = prev_variable_embeddings.size(0)
 
-        if num_vars < 1:
+        if num_vars < 2:
+            # Not enough variables to form a pair
             return torch.tensor([], dtype=torch.float)
 
-        # Generate queries for all variables
-        queries = self.query_net(variable_embeddings)  # [num_vars, hidden_dim]
+        # Get state context
+        context = self.context_net(next_state_embedding)  # [hidden_dim]
 
-        # Add state context
-        context = self.context_net(state_embedding)  # [hidden_dim]
+        # Generate queries and keys for all variables
+        queries = self.query_net(prev_variable_embeddings)  # [num_vars, hidden_dim]
+        keys = self.key_net(prev_variable_embeddings)  # [num_vars, hidden_dim]
+
+        # Add context to queries and keys
         queries = queries + context.unsqueeze(0)
+        keys = keys + context.unsqueeze(0)
 
-        # Compute scores for each variable being the unified variable
-        # Higher score = more likely this variable was created by unification
-        scores = torch.sum(queries * context.unsqueeze(0), dim=1)  # [num_vars]
+        # Score all pairs (i, j) where i < j
+        pair_scores = []
+        for i in range(num_vars):
+            for j in range(i + 1, num_vars):
+                # Concatenate query and key for this pair
+                pair_repr = torch.cat([queries[i], keys[j]], dim=0)  # [hidden_dim * 2]
 
-        return scores
+                # Score this pair
+                score = self.pair_scorer(pair_repr)  # [1]
+                pair_scores.append(score.squeeze())
+
+        if not pair_scores:
+            return torch.tensor([], dtype=torch.float)
+
+        # Return raw logits (not log_softmax)
+        pair_logits = torch.stack(pair_scores)  # [num_pairs]
+        return pair_logits
 
 
 class SophisticatedBackwardPolicy(nn.Module):
@@ -303,7 +334,8 @@ class SophisticatedBackwardPolicy(nn.Module):
             previous_state: The previous state (Theory) - s
             action_type: The forward action that was taken ('ADD_ATOM' or 'UNIFY_VARIABLES')
             action_detail: Details of the action (predicate name or variable pair)
-            variable_embeddings: Embeddings of variables in next_state (needed for UNIFY_VARIABLES)
+            variable_embeddings: Embeddings of variables in PREVIOUS state (needed for UNIFY_VARIABLES)
+                                 [FIXED DOCSTRING]
 
         Returns:
             log_prob: Log probability of the backward transition P_B(s'->s)
@@ -318,56 +350,85 @@ class SophisticatedBackwardPolicy(nn.Module):
 
         # Step 2: Get action-specific probability
         if action_type == 'ADD_ATOM':
-            # Predict which predicate was added
-            # action_detail is the predicate name that was added
-
-            # Get atom remover logits
+            # This part was already correct
             atom_logits = self.atom_remover(next_state_embedding)
             atom_log_probs = F.log_softmax(atom_logits, dim=-1)
 
-            # Map the predicate name to its index in the vocabulary
             if action_detail is not None and action_detail in self.predicate_vocab:
                 predicate_idx = self.predicate_vocab.index(action_detail)
                 log_prob_detail = atom_log_probs[predicate_idx]
             else:
-                # Fallback: if predicate not found, use small penalty
-                # This shouldn't happen in normal operation
-                log_prob_detail = torch.tensor(-10.0)  # Large negative log prob
+                log_prob_detail = torch.tensor(-10.0)
 
         elif action_type == 'UNIFY_VARIABLES':
-            # Predict which variables were unified in the forward direction
-            # action_detail is a tuple (var1, var2) from the PREVIOUS state that were unified
-            # The challenge: we're looking at the NEXT state, which has fewer variables
+            
+            # --- START OF FIX ---
+            
+            # We need to import this function
+            from .logic_structures import get_all_variables, get_valid_variable_pairs
 
-            # For variable unification, we need embeddings from the PREVIOUS state
-            # since that's where the two variables existed before being unified
-            # However, we only have next_state embeddings here
+            if action_detail is None or variable_embeddings is None:
+                return torch.tensor(-10.0)
 
-            # Practical solution: The backward variable splitter predicts which variable
-            # in the current (next) state was the result of unification
-            # We use a heuristic: uniform probability over valid pairs in previous state
+            valid_pairs = get_valid_variable_pairs(previous_state)
+            all_prev_variables = get_all_variables(previous_state)
+            num_prev_vars = len(all_prev_variables)
 
-            if action_detail is not None:
-                # We know which pair was unified: var1, var2
-                # For backward probability, we can use a simpler estimate:
-                # P_B(unify var1,var2 | next_state) ≈ 1 / num_possible_pairs_in_prev_state
+            if not valid_pairs or num_prev_vars < 2:
+                return torch.tensor(-1e6)
 
-                # Get number of variables in previous state to estimate num possible pairs
-                from .logic_structures import get_all_variables, get_valid_variable_pairs
+            # Get logits for ALL possible pairs from the previous state
+            pair_logits = self.variable_splitter(next_state_embedding, variable_embeddings)
 
-                prev_vars = get_all_variables(previous_state)
-                num_prev_vars = len(prev_vars)
+            # Check if model returned any logits
+            if pair_logits.numel() == 0:
+                 return torch.tensor(-1e6)
 
-                if num_prev_vars >= 2:
-                    # Approximate: uniform distribution over all valid pairs
-                    # Number of pairs = n*(n-1)/2
-                    num_pairs = num_prev_vars * (num_prev_vars - 1) // 2
-                    import math
-                    log_prob_detail = torch.tensor(-math.log(max(num_pairs, 1)), dtype=torch.float32)
-                else:
-                    log_prob_detail = torch.tensor(-10.0)
+            # --- Apply mask to get correct probabilities ---
+            
+            # Manually create the list of (i, j) index pairs the splitter scored
+            # (since BackwardVariableSplitter doesn't have get_pair_indices)
+            all_scored_pairs = []
+            for i in range(num_prev_vars):
+                for j in range(i + 1, num_prev_vars):
+                    all_scored_pairs.append((i, j))
+            
+            # Ensure the number of logits matches our expectation
+            if len(all_scored_pairs) != pair_logits.shape[0]:
+                # This would be a major internal error
+                return torch.tensor(-1e9) 
+
+            masked_logits = torch.full_like(pair_logits, float('-inf'))
+            valid_pair_ids_set = {tuple(sorted((v1.id, v2.id))) for v1, v2 in valid_pairs}
+            
+            pair_id_to_logit_idx = {} # Maps (v_id1, v_id2) -> logit_idx
+
+            for logit_idx, (var_i_idx, var_j_idx) in enumerate(all_scored_pairs):
+                var_i = all_prev_variables[var_i_idx]
+                var_j = all_prev_variables[var_j_idx]
+                pair_ids = tuple(sorted((var_i.id, var_j.id)))
+
+                if pair_ids in valid_pair_ids_set:
+                    masked_logits[logit_idx] = pair_logits[logit_idx]
+                    pair_id_to_logit_idx[pair_ids] = logit_idx
+            
+            # --- End Masking ---
+            
+            pair_log_probs = F.log_softmax(masked_logits, dim=-1) # Probabilities over *valid* actions
+
+            # Get the ID of the action that was actually taken
+            chosen_pair = action_detail # This is (var1, var2)
+            chosen_pair_ids = tuple(sorted((chosen_pair[0].id, chosen_pair[1].id)))
+
+            if chosen_pair_ids in pair_id_to_logit_idx:
+                correct_logit_idx = pair_id_to_logit_idx[chosen_pair_ids]
+                log_prob_detail = pair_log_probs[correct_logit_idx]
             else:
-                log_prob_detail = torch.tensor(-10.0)
+                # This action wasn't valid, shouldn't happen
+                log_prob_detail = torch.tensor(-1e6)
+            
+            # --- END OF FIX ---
+
         else:
             log_prob_detail = torch.tensor(0.0)
 

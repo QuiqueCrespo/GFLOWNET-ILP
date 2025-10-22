@@ -1,3 +1,4 @@
+
 import sys
 
 sys.path.insert(0, '/Users/jq23948/Documents/GFLOWNET-ILP')
@@ -11,8 +12,6 @@ from src.gflownet_models import HierarchicalGFlowNet
 from src.training import GFlowNetTrainer
 from src.exploration import get_combined_strategy
 from src.visualization import TrainingVisualizer
-
-
 
 # Problem setup
 background_facts = [

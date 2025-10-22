@@ -83,6 +83,10 @@ class EnhancedGraphConstructor:
                 body_vars.add(var)
                 var_counts[var] = var_counts.get(var, 0) + 1
 
+        # add vars in head
+        for var in rule.head.args:
+            var_counts[var] = var_counts.get(var, 0) + 1
+
         # Build variable nodes with rich features
         variables = self._get_canonical_variables(theory)
         var_to_node = {var: idx for idx, var in enumerate(variables)}
@@ -106,7 +110,7 @@ class EnhancedGraphConstructor:
             *self._one_hot_predicate(rule.head.predicate_name),  # predicate type
             1.0,                                      # is_head
             0.0,                                      # is_body
-            0.0,                                      # body_position
+            # 0.0,                                      # body_position
             1.0 if head_self_loop else 0.0,         # has_self_loop
             float(len(set(rule.head.args))),         # num_unique_vars
             float(len(rule.head.args)),              # total_vars
@@ -132,7 +136,7 @@ class EnhancedGraphConstructor:
                 *self._one_hot_predicate(atom.predicate_name),
                 0.0,                                      # is_head
                 1.0,                                      # is_body
-                float(body_pos),                          # body_position
+                # float(body_pos),                          # body_position
                 1.0 if atom_self_loop else 0.0,         # has_self_loop
                 float(len(set(atom.args))),              # num_unique_vars
                 float(len(atom.args)),                   # total_vars
