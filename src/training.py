@@ -37,13 +37,19 @@ class TrajectoryReplayBuffer:
     """Replay buffer for high-reward trajectories (off-policy learning)."""
 
     def __init__(self, capacity: int = 100):
-        self.buffer = deque(maxlen=capacity)
+        self.buffer = list()
         self.capacity = capacity
 
     def add(self, trajectory: List[TrajectoryStep], reward: float):
         """Add trajectory to buffer."""
-        self.buffer.append((trajectory, reward))
-
+        if len(self.buffer) >= self.capacity:
+            # Remove lowest-reward trajectory if smaller than new reward
+            self.buffer.sort(key=lambda x: x[1])  # Sort by reward
+            if reward > self.buffer[0][1]:
+                self.buffer.pop(0)
+                self.buffer.append((trajectory, reward))
+        else:
+            self.buffer.append((trajectory, reward))
     def sample(self, n: int = 1) -> List[Tuple[List[TrajectoryStep], float]]:
         """Sample n trajectories with probability proportional to reward."""
         if len(self.buffer) == 0:
@@ -234,7 +240,8 @@ class GFlowNetTrainer:
     def generate_trajectory(self, initial_state: Theory,
                            positive_examples: List[Example],
                            negative_examples: List[Example],
-                           max_steps: int = 10) -> Tuple[List[TrajectoryStep], float]:
+                           max_steps: int = 10,
+                           stochastic: bool = True) -> Tuple[List[TrajectoryStep], float]:
         """
         Generate a single trajectory by sampling from the current policy.
 
@@ -276,19 +283,19 @@ class GFlowNetTrainer:
             )
 
             # 5. Sample action
-            action, log_prob_action = self._sample_action_from_logits(action_logits)
+            action, log_prob_action = self._sample_action_from_logits(action_logits, stochastic)
 
             # 6. Handle the chosen action
             log_prob_detail = None
             if action == 0:  # ADD_ATOM
                 next_state, max_var_id, action_detail, log_prob_detail = \
                     self._handle_action_add_atom(
-                        state_embedding, current_state, max_var_id, step_count
+                        state_embedding, current_state, max_var_id, step_count, stochastic
                     )
             elif action == 1:  # UNIFY_VARIABLES
                 next_state, action_detail, log_prob_detail = \
                     self._handle_action_unify_vars(
-                        state_embedding, node_embeddings, current_state, valid_pairs
+                        state_embedding, node_embeddings, current_state, valid_pairs, stochastic
                     )
             elif action == 2:  # TERMINATE
                 next_state, action_detail, log_prob_detail = \
@@ -390,15 +397,18 @@ class GFlowNetTrainer:
             
         return logits
 
-    def _sample_action_from_logits(self, logits):
+    def _sample_action_from_logits(self, logits, stochastic: bool = True):
         """Samples an action from logits and returns action + log_prob."""
         action_probs = F.softmax(logits, dim=-1)
-        action = torch.multinomial(action_probs, 1).item()
+        if stochastic:
+            action = torch.multinomial(action_probs, 1).item()
+        else:
+            action = action_probs.argmax().item()
         log_prob = torch.log(action_probs[action] + 1e-10)
         return action, log_prob
 
     def _handle_action_add_atom(self, state_embedding, current_state: Theory,
-                                max_var_id: int, step_count: int):
+                                max_var_id: int, step_count: int, stochastic: bool = True):
         """Handles the ADD_ATOM action logic."""
         atom_logits = self.gflownet.forward_atom_adder(state_embedding)
 
@@ -409,7 +419,7 @@ class GFlowNetTrainer:
                 step_count=step_count
             )
 
-        pred_idx, log_prob_detail = self._sample_action_from_logits(atom_logits)
+        pred_idx, log_prob_detail = self._sample_action_from_logits(atom_logits, stochastic)
         
         pred_name = self.predicate_vocab[pred_idx]
         pred_arity = self.predicate_arities[pred_name]
@@ -421,9 +431,9 @@ class GFlowNetTrainer:
         
         return next_state, new_max_var_id, action_detail, log_prob_detail
 
-    def _handle_action_unify_vars(self, state_embedding, node_embeddings, 
-                                  current_state: Theory, valid_pairs: list):
-        """Handles the UNIFY_VARIABLES action logic."""
+    def _handle_action_unify_vars(self, state_embedding, node_embeddings,
+                                  current_state: Theory, valid_pairs: list,
+                                  stochastic: bool = True):
         """Handles the UNIFY_VARIABLES action logic."""
         variables = get_all_variables(current_state)
         num_vars = len(variables)
@@ -461,7 +471,7 @@ class GFlowNetTrainer:
                 logit_idx_to_action[logit_idx] = (var_i, var_j)
 
         # Sample from the *masked* logits
-        pair_idx_from_all, log_prob_detail = self._sample_action_from_logits(masked_logits)
+        pair_idx_from_all, log_prob_detail = self._sample_action_from_logits(masked_logits, stochastic)
 
         # Get the chosen action (var1, var2)
         # pair_idx_from_all is the *index in the full logit tensor*
@@ -499,20 +509,20 @@ class GFlowNetTrainer:
             reward = self.reward_cache[state_key]
         else:
             # Compute and cache
-            reward = self.reward_calculator.calculate_reward(
-                final_state, positive_examples, negative_examples
-            )
-            self.reward_cache[state_key] = reward
-
-        # SAFETY: Check for zero positive examples
-        # Get detailed scores to check True Positives (TP)
-        scores = self.reward_calculator.get_detailed_scores(
+            scores = self.reward_calculator.get_detailed_scores(
             final_state, positive_examples, negative_examples
-        )
-        if scores['TP'] == 0:
-            # This rule covers no positives - cache for future avoidance
-            self.zero_positive_cache.add(state_key)
-            reward = 1e-6 # Assign minimal reward
+            )
+
+            reward = scores['reward']
+            if scores['TP'] == 0:
+                # This rule covers no positives - cache for future avoidance
+                self.zero_positive_cache.add(state_key)
+                reward = 1e-6 # Assign minimal reward
+            self.reward_cache[state_key] = reward
+        
+
+
+        
 
         # Apply exploration strategy bonus (if reward is not already minimal)
         if self.exploration_strategy and reward > 1e-6:
@@ -553,10 +563,8 @@ class GFlowNetTrainer:
         sum_log_pb = torch.tensor(0.0, dtype=torch.float32)
 
         for step in trajectory:
-            # --- FIX: Skip the TERMINATE step for P_B sum ---
             if step.action_type == 'TERMINATE':
                 continue
-            # --- END FIX ---
 
             # Encode next state to get its embedding
             graph_data_next = self.graph_constructor.theory_to_graph(step.next_state)
@@ -692,8 +700,6 @@ class GFlowNetTrainer:
                      len(self.replay_buffer) > 0 and
                      random.random() < self.replay_probability)
 
-        if self.freeze_encoder: 
-            self.embedding_cache.clear()
         
         if use_replay:
 
@@ -756,7 +762,7 @@ class GFlowNetTrainer:
         metrics = {
             'loss': total_loss.item(),
             'on_policy_reward': on_policy_reward,
-            'trajectory_length': len(on_policy_trajectory),
+            'trajectory_length': len(on_policy_trajectory) if on_policy_trajectory else len(replayed_trajectory) if use_replay else 0,
             'log_Z': self.log_Z.item()
         }
         metrics.update(metrics_info)

@@ -1,0 +1,84 @@
+================================================================================
+POLICY CONVERGENCE REPORT
+================================================================================
+
+Episodes tracked: 299
+Test states: 4
+
+--------------------------------------------------------------------------------
+State: Initial (empty body)
+  grandparent(X0, X1).
+--------------------------------------------------------------------------------
+
+Forward Strategist:
+  Episode   100: ADD=0.3182, UNIFY=0.3667, TERM=0.3152
+  Episode 29900: ADD=0.6387, UNIFY=0.3081, TERM=0.0532
+
+Backward Strategist:
+  Episode   100: ADD=0.4864, UNIFY=0.5136
+  Episode 29900: ADD=0.6420, UNIFY=0.3580
+
+Forward-Backward Divergence:
+  ADD_ATOM:        0.1682 → 0.0032
+  UNIFY_VARIABLES: 0.1470 → 0.0500
+
+  ✓ Policies CONVERGED (divergence < 0.1)
+
+--------------------------------------------------------------------------------
+State: After 1 ADD_ATOM
+  grandparent(X0, X1) :- parent(X2, X3).
+--------------------------------------------------------------------------------
+
+Forward Strategist:
+  Episode   100: ADD=0.3181, UNIFY=0.3667, TERM=0.3152
+  Episode 29900: ADD=0.5059, UNIFY=0.4703, TERM=0.0238
+
+Backward Strategist:
+  Episode   100: ADD=0.4863, UNIFY=0.5137
+  Episode 29900: ADD=0.5034, UNIFY=0.4966
+
+Forward-Backward Divergence:
+  ADD_ATOM:        0.1682 → 0.0024
+  UNIFY_VARIABLES: 0.1470 → 0.0262
+
+  ✓ Policies CONVERGED (divergence < 0.1)
+
+--------------------------------------------------------------------------------
+State: After 2 ADD_ATOMs
+  grandparent(X0, X1) :- parent(X2, X3), parent(X4, X5).
+--------------------------------------------------------------------------------
+
+Forward Strategist:
+  Episode   100: ADD=0.3181, UNIFY=0.3667, TERM=0.3152
+  Episode 29900: ADD=0.3964, UNIFY=0.5917, TERM=0.0119
+
+Backward Strategist:
+  Episode   100: ADD=0.4863, UNIFY=0.5137
+  Episode 29900: ADD=0.4032, UNIFY=0.5968
+
+Forward-Backward Divergence:
+  ADD_ATOM:        0.1682 → 0.0068
+  UNIFY_VARIABLES: 0.1470 → 0.0051
+
+  ✓ Policies CONVERGED (divergence < 0.1)
+
+--------------------------------------------------------------------------------
+State: After 1 ADD_ATOM + UNIFY
+  grandparent(X0, X1) :- parent(X0, X3).
+--------------------------------------------------------------------------------
+
+Forward Strategist:
+  Episode   100: ADD=0.3181, UNIFY=0.3668, TERM=0.3151
+  Episode 29900: ADD=0.6262, UNIFY=0.2939, TERM=0.0798
+
+Backward Strategist:
+  Episode   100: ADD=0.4863, UNIFY=0.5137
+  Episode 29900: ADD=0.6428, UNIFY=0.3572
+
+Forward-Backward Divergence:
+  ADD_ATOM:        0.1682 → 0.0166
+  UNIFY_VARIABLES: 0.1469 → 0.0632
+
+  ✓ Policies CONVERGED (divergence < 0.1)
+
+================================================================================

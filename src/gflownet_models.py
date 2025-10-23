@@ -7,8 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Dict, List, Tuple
 
-from .logic_structures import get_valid_variable_pairs
-
+from .logic_structures import get_all_variables, get_valid_variable_pairs
 
 class StrategistGFlowNet(nn.Module):
     """
@@ -28,13 +27,13 @@ class StrategistGFlowNet(nn.Module):
         )
 
 
-    def forward(self, state_embedding: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, state_embedding: torch.Tensor) -> torch.Tensor:
         """
         Args:
             state_embedding: [batch_size, embedding_dim] or [embedding_dim]
 
         Returns:
-            - action_logits: [batch_size, 2] or [2]
+            - action_logits: [batch_size, 3] or [3]
         """
         action_logits = self.policy_net(state_embedding)
         return action_logits
@@ -297,6 +296,17 @@ class BackwardVariableSplitter(nn.Module):
         pair_logits = torch.stack(pair_scores)  # [num_pairs]
         return pair_logits
 
+    def get_pair_indices(self, num_vars: int) -> List[Tuple[int, int]]:
+        """
+        Get list of (i, j) pairs in the order they are scored.
+        (Mirrors the forward unifier's helper).
+        """
+        pairs = []
+        for i in range(num_vars):
+            for j in range(i + 1, num_vars):
+                pairs.append((i, j))
+        return pairs
+
 
 class SophisticatedBackwardPolicy(nn.Module):
     """
@@ -335,7 +345,6 @@ class SophisticatedBackwardPolicy(nn.Module):
             action_type: The forward action that was taken ('ADD_ATOM' or 'UNIFY_VARIABLES')
             action_detail: Details of the action (predicate name or variable pair)
             variable_embeddings: Embeddings of variables in PREVIOUS state (needed for UNIFY_VARIABLES)
-                                 [FIXED DOCSTRING]
 
         Returns:
             log_prob: Log probability of the backward transition P_B(s'->s)
@@ -365,7 +374,7 @@ class SophisticatedBackwardPolicy(nn.Module):
             # --- START OF FIX ---
             
             # We need to import this function
-            from .logic_structures import get_all_variables, get_valid_variable_pairs
+            
 
             if action_detail is None or variable_embeddings is None:
                 return torch.tensor(-10.0)
@@ -386,12 +395,8 @@ class SophisticatedBackwardPolicy(nn.Module):
 
             # --- Apply mask to get correct probabilities ---
             
-            # Manually create the list of (i, j) index pairs the splitter scored
-            # (since BackwardVariableSplitter doesn't have get_pair_indices)
-            all_scored_pairs = []
-            for i in range(num_prev_vars):
-                for j in range(i + 1, num_prev_vars):
-                    all_scored_pairs.append((i, j))
+            # Use the new helper method to get the pairs in the correct order
+            all_scored_pairs = self.variable_splitter.get_pair_indices(num_prev_vars)
             
             # Ensure the number of logits matches our expectation
             if len(all_scored_pairs) != pair_logits.shape[0]:
@@ -424,7 +429,7 @@ class SophisticatedBackwardPolicy(nn.Module):
                 correct_logit_idx = pair_id_to_logit_idx[chosen_pair_ids]
                 log_prob_detail = pair_log_probs[correct_logit_idx]
             else:
-                # This action wasn't valid, shouldn't happen
+                # This action wasn't valid, or was masked.
                 log_prob_detail = torch.tensor(-1e6)
             
             # --- END OF FIX ---
@@ -446,61 +451,60 @@ class UniformBackwardPolicy(nn.Module):
 
     def forward(self, state_embedding: torch.Tensor) -> torch.Tensor:
         """
-        Args:
-            state_embedding: [batch_size, embedding_dim] or [embedding_dim]
-
-        Returns:
-            action_logits: [batch_size, 2] or [2] for action types (ADD_ATOM, UNIFY_VARIABLES)
-            Note: Returns uniform logits (zeros) which correspond to uniform probabilities after softmax
+        Returns uniform logits (zeros) for the two backward action types.
         """
         if state_embedding.dim() == 1:
-            # Single state, return uniform logits (zeros for uniform distribution)
-            return torch.zeros(2)  # 2 action types: ADD_ATOM, UNIFY_VARIABLES
+            return torch.zeros(2)  # [ADD_ATOM, UNIFY_VARIABLES]
         else:
-            # Batch of states
             batch_size = state_embedding.size(0)
             return torch.zeros(batch_size, 2)
 
-    def get_log_probability(self, next_state_embedding: torch.Tensor, previous_state) -> torch.Tensor:
+    def get_log_probability(self, next_state_embedding: torch.Tensor,
+                            next_state) -> torch.Tensor:
         """
-        Compute the log probability of transitioning backward from next_state to previous_state.
-        For uniform backward policy, this is uniform over possible parent states.
+        Compute the log probability of transitioning backward from next_state (s')
+        to any parent state (s).
+        
+        P_B(s'->s) = 1 / N(s'), where N(s') is the number of possible parents of s'.
 
         Args:
             next_state_embedding: Embedding of the next state (s')
-            previous_state: The previous state (s) - used to determine num parents
+            next_state: The next state (Theory) - s'
 
         Returns:
-            log_prob: Log probability of the backward transition P_B(s'->s)
+            log_prob: Log probability P_B(s'->s)
         """
-        # For uniform backward policy: P_B(s'->s) = 1 / num_possible_parents(s')
-        # We need to estimate how many different states could lead to next_state
-
         from .logic_structures import get_all_variables
         import math
 
-        # Estimate number of possible parent states that could lead to next_state:
-        # 1. ADD_ATOM parents: One parent for each predicate that could have been added
-        #    Number = num_predicates (each predicate gives a different parent state)
-        # 2. UNIFY_VARIABLES parents: One parent for each pair of variables that could have been unified
-        #    Number = n*(n-1)/2 where n is number of variables in previous state
+        # A correct uniform policy's probability depends on the state s' (next_state),
+        # not the state s (previous_state). We must estimate the number of
+        # valid parent states for s'.
 
-        # Get number of variables in previous state to estimate unification parents
-        if previous_state and len(previous_state) > 0:
-            prev_vars = get_all_variables(previous_state)
-            num_prev_vars = len(prev_vars)
+        num_possible_parents = 0
 
-            # Count possible parent states:
-            # - From ADD_ATOM: num_predicates different parent states
-            num_add_parents = self.num_predicates
+        # Case 1: Parents from 'ADD_ATOM'
+        # Any atom in the body could have been the last one added.
+        if next_state and len(next_state) > 0:
+            num_possible_parents += len(next_state[0].body)
+        
+        # Case 2: Parents from 'UNIFY_VARIABLES'
+        # Any variable could be the result of a unification.
+        # This is a very rough estimate, but better than the old logic.
+        # A more complex (but correct) way would be to count "splittable" variables.
+        # For simplicity, we'll estimate based on total variables.
+        if next_state and len(next_state) > 0:
+            variables = get_all_variables(next_state)
+            num_vars = len(variables)
+            # A state with N vars could have come from a state with N+1 vars.
+            # The number of pairs in that N+1 state is (N+1)*N/2.
+            # This is a heuristic estimate.
+            num_unify_parents = (num_vars * (num_vars + 1) // 2) if num_vars >= 1 else 0
+            num_possible_parents += num_unify_parents
 
-            # - From UNIFY_VARIABLES: n*(n-1)/2 different parent states (one per variable pair)
-            num_unify_parents = (num_prev_vars * (num_prev_vars - 1) // 2) if num_prev_vars >= 2 else 0
-
-            # Total possible parents = sum of parents from both action types
-            num_possible_parents = num_add_parents + num_unify_parents
-        else:
-            # Fallback: only ADD_ATOM possible
+        # If there are no atoms and no variables, it must have come from
+        # the initial state via an ADD_ATOM action (of which there are num_predicates)
+        if num_possible_parents == 0:
             num_possible_parents = self.num_predicates
 
         # Uniform probability: P_B(s'->s) = 1 / num_possible_parents
@@ -529,8 +533,8 @@ class HierarchicalGFlowNet(nn.Module):
             # Uniform policy needs num_predicates to estimate parent states
             self.backward_policy = UniformBackwardPolicy(num_predicates)
 
-    def forward_strategist(self, state_embedding: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Get strategist action logits and flow."""
+    def forward_strategist(self, state_embedding: torch.Tensor) -> torch.Tensor:
+        """Get strategist action logits."""
         return self.strategist(state_embedding)
 
     def forward_atom_adder(self, state_embedding: torch.Tensor) -> torch.Tensor:
@@ -564,7 +568,7 @@ class HierarchicalGFlowNet(nn.Module):
             previous_state: The previous state (Theory) - s
             action_type: The forward action that was taken ('ADD_ATOM' or 'UNIFY_VARIABLES')
             action_detail: Details of the action (predicate name or variable pair)
-            variable_embeddings: Embeddings of variables in next_state (optional, for sophisticated policy)
+            variable_embeddings: Embeddings of variables in PREVIOUS state (optional, for sophisticated policy)
 
         Returns:
             log_prob: Log probability of the backward transition P_B(s'->s)
@@ -580,10 +584,10 @@ class HierarchicalGFlowNet(nn.Module):
                 variable_embeddings
             )
         else:
-            # Simple uniform backward policy only needs embeddings and previous state
+            # Simple uniform backward policy
             return self.backward_policy.get_log_probability(
                 next_state_embedding,
-                previous_state
+                next_state  # Pass next_state
             )
 
     def get_all_parameters(self) -> List[torch.nn.Parameter]:

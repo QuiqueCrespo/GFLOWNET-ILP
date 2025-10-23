@@ -218,7 +218,7 @@ class RewardCalculator:
         # Calculate reward based on mode
         if self.use_f1:
             # Use F1-score as primary metric (harmonic mean)
-            reward = (f1_score +
+            reward = 10* (f1_score +
                      self.weight_simplicity * simplicity -
                      uninformative_penalty -
                      disconnected_penalty_value -
@@ -226,7 +226,7 @@ class RewardCalculator:
                      free_var_penalty_value)
         else:
             # Use weighted precision + recall (more flexible)
-            reward = (self.weight_precision * precision +
+            reward = 10 * (self.weight_precision * precision +
                      self.weight_recall * recall +
                      self.weight_simplicity * simplicity -
                      uninformative_penalty -
@@ -295,14 +295,14 @@ class RewardCalculator:
 
         # Calculate reward (SAME formula as calculate_reward)
         if self.use_f1:
-            reward = (f1_score +
+            reward = 10 * (f1_score +
                      self.weight_simplicity * simplicity -
                      uninformative_penalty -
                      disconnected_penalty_value -
                      self_loop_penalty_value -
                      free_var_penalty_value)
         else:
-            reward = (self.weight_precision * precision +
+            reward = 10 * (self.weight_precision * precision +
                      self.weight_recall * recall +
                      self.weight_simplicity * simplicity -
                      uninformative_penalty -

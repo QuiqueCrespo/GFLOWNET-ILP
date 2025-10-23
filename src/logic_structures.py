@@ -185,11 +185,23 @@ def get_valid_variable_pairs(theory: Theory) -> List[Tuple[Variable, Variable]]:
     """
     Get all valid pairs of variables that can be unified.
     A valid pair consists of two different variables.
+    Excludes pairs where both variables are in the head (would create self-loops).
     """
+    if not theory:
+        return []
+
+    rule = theory[0]
+    head_vars = set(arg for arg in rule.head.args if isinstance(arg, Variable))
+
     variables = get_all_variables(theory)
     pairs = []
+
     for i, v1 in enumerate(variables):
         for v2 in variables[i+1:]:
             if v1 != v2:
+                # Exclude pairs where BOTH are in head (would create self-loops like grandparent(X0, X0))
+                if v1 in head_vars and v2 in head_vars:
+                    continue  # Skip this pair
                 pairs.append((v1, v2))
+
     return pairs

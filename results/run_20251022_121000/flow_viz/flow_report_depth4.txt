@@ -1,0 +1,603 @@
+================================================================================
+FLOW PREDICTION ANALYSIS REPORT
+================================================================================
+
+Configuration:
+  Target predicate: grandparent
+  Depth from origin: 4
+  States analyzed: 115
+  Episodes tracked: 500
+
+--------------------------------------------------------------------------------
+Flow-Reward Correlation Evolution:
+--------------------------------------------------------------------------------
+Episode    10: Correlation = -0.2183
+Episode    20: Correlation = -0.1985
+Episode    30: Correlation = -0.1696
+Episode    40: Correlation = -0.1513
+Episode    50: Correlation = -0.1323
+Episode    60: Correlation = -0.1265
+Episode    70: Correlation = -0.1212
+Episode    80: Correlation = -0.1286
+Episode    90: Correlation = -0.1354
+Episode   100: Correlation = -0.1013
+Episode   110: Correlation = -0.1022
+Episode   120: Correlation = -0.1102
+Episode   130: Correlation = -0.1313
+Episode   140: Correlation = -0.1438
+Episode   150: Correlation = -0.1500
+Episode   160: Correlation = -0.1500
+Episode   170: Correlation = -0.1657
+Episode   180: Correlation = -0.1672
+Episode   190: Correlation = -0.1823
+Episode   200: Correlation = -0.1864
+Episode   210: Correlation = -0.1953
+Episode   220: Correlation = -0.2054
+Episode   230: Correlation = -0.2095
+Episode   240: Correlation = -0.2095
+Episode   250: Correlation = -0.2061
+Episode   260: Correlation = -0.2006
+Episode   270: Correlation = -0.1948
+Episode   280: Correlation = -0.1873
+Episode   290: Correlation = -0.1828
+Episode   300: Correlation = -0.1768
+Episode   310: Correlation = -0.1726
+Episode   320: Correlation = -0.1707
+Episode   330: Correlation = -0.1716
+Episode   340: Correlation = -0.1659
+Episode   350: Correlation = -0.1601
+Episode   360: Correlation = -0.1533
+Episode   370: Correlation = -0.1476
+Episode   380: Correlation = -0.1431
+Episode   390: Correlation = -0.1398
+Episode   400: Correlation = -0.1377
+Episode   410: Correlation = -0.1367
+Episode   420: Correlation = -0.1362
+Episode   430: Correlation = -0.1344
+Episode   440: Correlation = -0.1326
+Episode   450: Correlation = -0.1301
+Episode   460: Correlation = -0.1270
+Episode   470: Correlation = -0.1236
+Episode   480: Correlation = -0.1207
+Episode   490: Correlation = -0.1186
+Episode   500: Correlation = -0.1162
+Episode   510: Correlation = -0.1147
+Episode   520: Correlation = -0.1133
+Episode   530: Correlation = -0.1114
+Episode   540: Correlation = -0.1094
+Episode   550: Correlation = -0.1079
+Episode   560: Correlation = -0.1067
+Episode   570: Correlation = -0.1047
+Episode   580: Correlation = -0.1018
+Episode   590: Correlation = -0.0996
+Episode   600: Correlation = -0.0974
+Episode   610: Correlation = -0.0954
+Episode   620: Correlation = -0.0927
+Episode   630: Correlation = -0.0915
+Episode   640: Correlation = -0.0892
+Episode   650: Correlation = -0.0874
+Episode   660: Correlation = -0.0863
+Episode   670: Correlation = -0.0860
+Episode   680: Correlation = -0.0852
+Episode   690: Correlation = -0.0843
+Episode   700: Correlation = -0.0822
+Episode   710: Correlation = -0.0806
+Episode   720: Correlation = -0.0792
+Episode   730: Correlation = -0.0776
+Episode   740: Correlation = -0.0758
+Episode   750: Correlation = -0.0747
+Episode   760: Correlation = -0.0738
+Episode   770: Correlation = -0.0721
+Episode   780: Correlation = -0.0709
+Episode   790: Correlation = -0.0690
+Episode   800: Correlation = -0.0674
+Episode   810: Correlation = -0.0656
+Episode   820: Correlation = -0.0632
+Episode   830: Correlation = -0.0608
+Episode   840: Correlation = -0.0587
+Episode   850: Correlation = -0.0568
+Episode   860: Correlation = -0.0552
+Episode   870: Correlation = -0.0527
+Episode   880: Correlation = -0.0515
+Episode   890: Correlation = -0.0503
+Episode   900: Correlation = -0.0491
+Episode   910: Correlation = -0.0469
+Episode   920: Correlation = -0.0455
+Episode   930: Correlation = -0.0446
+Episode   940: Correlation = -0.0438
+Episode   950: Correlation = -0.0421
+Episode   960: Correlation = -0.0399
+Episode   970: Correlation = -0.0381
+Episode   980: Correlation = -0.0357
+Episode   990: Correlation = -0.0336
+Episode  1000: Correlation = -0.0318
+Episode  1010: Correlation = -0.0304
+Episode  1020: Correlation = -0.0286
+Episode  1030: Correlation = -0.0279
+Episode  1040: Correlation = -0.0270
+Episode  1050: Correlation = -0.0259
+Episode  1060: Correlation = -0.0238
+Episode  1070: Correlation = -0.0228
+Episode  1080: Correlation = -0.0225
+Episode  1090: Correlation = -0.0212
+Episode  1100: Correlation = -0.0199
+Episode  1110: Correlation = -0.0194
+Episode  1120: Correlation = -0.0175
+Episode  1130: Correlation = -0.0164
+Episode  1140: Correlation = -0.0148
+Episode  1150: Correlation = -0.0130
+Episode  1160: Correlation = -0.0121
+Episode  1170: Correlation = -0.0100
+Episode  1180: Correlation = -0.0078
+Episode  1190: Correlation = -0.0067
+Episode  1200: Correlation = -0.0063
+Episode  1210: Correlation = -0.0072
+Episode  1220: Correlation = -0.0059
+Episode  1230: Correlation = -0.0042
+Episode  1240: Correlation = -0.0034
+Episode  1250: Correlation = -0.0034
+Episode  1260: Correlation = -0.0024
+Episode  1270: Correlation = -0.0028
+Episode  1280: Correlation = -0.0025
+Episode  1290: Correlation = +0.0015
+Episode  1300: Correlation = +0.0061
+Episode  1310: Correlation = +0.0086
+Episode  1320: Correlation = +0.0117
+Episode  1330: Correlation = +0.0134
+Episode  1340: Correlation = +0.0150
+Episode  1350: Correlation = +0.0158
+Episode  1360: Correlation = +0.0169
+Episode  1370: Correlation = +0.0187
+Episode  1380: Correlation = +0.0200
+Episode  1390: Correlation = +0.0215
+Episode  1400: Correlation = +0.0228
+Episode  1410: Correlation = +0.0235
+Episode  1420: Correlation = +0.0249
+Episode  1430: Correlation = +0.0243
+Episode  1440: Correlation = +0.0248
+Episode  1450: Correlation = +0.0255
+Episode  1460: Correlation = +0.0261
+Episode  1470: Correlation = +0.0287
+Episode  1480: Correlation = +0.0308
+Episode  1490: Correlation = +0.0326
+Episode  1500: Correlation = +0.0326
+Episode  1510: Correlation = +0.0328
+Episode  1520: Correlation = +0.0330
+Episode  1530: Correlation = +0.0342
+Episode  1540: Correlation = +0.0365
+Episode  1550: Correlation = +0.0373
+Episode  1560: Correlation = +0.0387
+Episode  1570: Correlation = +0.0416
+Episode  1580: Correlation = +0.0437
+Episode  1590: Correlation = +0.0448
+Episode  1600: Correlation = +0.0455
+Episode  1610: Correlation = +0.0474
+Episode  1620: Correlation = +0.0492
+Episode  1630: Correlation = +0.0500
+Episode  1640: Correlation = +0.0528
+Episode  1650: Correlation = +0.0553
+Episode  1660: Correlation = +0.0586
+Episode  1670: Correlation = +0.0606
+Episode  1680: Correlation = +0.0634
+Episode  1690: Correlation = +0.0658
+Episode  1700: Correlation = +0.0655
+Episode  1710: Correlation = +0.0663
+Episode  1720: Correlation = +0.0665
+Episode  1730: Correlation = +0.0657
+Episode  1740: Correlation = +0.0676
+Episode  1750: Correlation = +0.0683
+Episode  1760: Correlation = +0.0685
+Episode  1770: Correlation = +0.0684
+Episode  1780: Correlation = +0.0719
+Episode  1790: Correlation = +0.0758
+Episode  1800: Correlation = +0.0778
+Episode  1810: Correlation = +0.0789
+Episode  1820: Correlation = +0.0786
+Episode  1830: Correlation = +0.0773
+Episode  1840: Correlation = +0.0788
+Episode  1850: Correlation = +0.0790
+Episode  1860: Correlation = +0.0786
+Episode  1870: Correlation = +0.0790
+Episode  1880: Correlation = +0.0813
+Episode  1890: Correlation = +0.0836
+Episode  1900: Correlation = +0.0854
+Episode  1910: Correlation = +0.0848
+Episode  1920: Correlation = +0.0854
+Episode  1930: Correlation = +0.0887
+Episode  1940: Correlation = +0.0895
+Episode  1950: Correlation = +0.0902
+Episode  1960: Correlation = +0.0934
+Episode  1970: Correlation = +0.0947
+Episode  1980: Correlation = +0.0932
+Episode  1990: Correlation = +0.0955
+Episode  2000: Correlation = +0.0963
+Episode  2010: Correlation = +0.1001
+Episode  2020: Correlation = +0.1036
+Episode  2030: Correlation = +0.1038
+Episode  2040: Correlation = +0.1059
+Episode  2050: Correlation = +0.1064
+Episode  2060: Correlation = +0.1060
+Episode  2070: Correlation = +0.1079
+Episode  2080: Correlation = +0.1111
+Episode  2090: Correlation = +0.1150
+Episode  2100: Correlation = +0.1192
+Episode  2110: Correlation = +0.1222
+Episode  2120: Correlation = +0.1248
+Episode  2130: Correlation = +0.1251
+Episode  2140: Correlation = +0.1265
+Episode  2150: Correlation = +0.1264
+Episode  2160: Correlation = +0.1245
+Episode  2170: Correlation = +0.1283
+Episode  2180: Correlation = +0.1321
+Episode  2190: Correlation = +0.1350
+Episode  2200: Correlation = +0.1387
+Episode  2210: Correlation = +0.1402
+Episode  2220: Correlation = +0.1400
+Episode  2230: Correlation = +0.1409
+Episode  2240: Correlation = +0.1413
+Episode  2250: Correlation = +0.1391
+Episode  2260: Correlation = +0.1403
+Episode  2270: Correlation = +0.1425
+Episode  2280: Correlation = +0.1468
+Episode  2290: Correlation = +0.1491
+Episode  2300: Correlation = +0.1507
+Episode  2310: Correlation = +0.1523
+Episode  2320: Correlation = +0.1551
+Episode  2330: Correlation = +0.1566
+Episode  2340: Correlation = +0.1559
+Episode  2350: Correlation = +0.1567
+Episode  2360: Correlation = +0.1549
+Episode  2370: Correlation = +0.1557
+Episode  2380: Correlation = +0.1561
+Episode  2390: Correlation = +0.1559
+Episode  2400: Correlation = +0.1603
+Episode  2410: Correlation = +0.1641
+Episode  2420: Correlation = +0.1665
+Episode  2430: Correlation = +0.1672
+Episode  2440: Correlation = +0.1675
+Episode  2450: Correlation = +0.1655
+Episode  2460: Correlation = +0.1695
+Episode  2470: Correlation = +0.1717
+Episode  2480: Correlation = +0.1727
+Episode  2490: Correlation = +0.1739
+Episode  2500: Correlation = +0.1774
+Episode  2510: Correlation = +0.1795
+Episode  2520: Correlation = +0.1819
+Episode  2530: Correlation = +0.1843
+Episode  2540: Correlation = +0.1843
+Episode  2550: Correlation = +0.1862
+Episode  2560: Correlation = +0.1893
+Episode  2570: Correlation = +0.1909
+Episode  2580: Correlation = +0.1907
+Episode  2590: Correlation = +0.1916
+Episode  2600: Correlation = +0.1946
+Episode  2610: Correlation = +0.1982
+Episode  2620: Correlation = +0.1988
+Episode  2630: Correlation = +0.1961
+Episode  2640: Correlation = +0.1950
+Episode  2650: Correlation = +0.1948
+Episode  2660: Correlation = +0.1963
+Episode  2670: Correlation = +0.1961
+Episode  2680: Correlation = +0.1975
+Episode  2690: Correlation = +0.1955
+Episode  2700: Correlation = +0.1960
+Episode  2710: Correlation = +0.1967
+Episode  2720: Correlation = +0.1987
+Episode  2730: Correlation = +0.2025
+Episode  2740: Correlation = +0.2053
+Episode  2750: Correlation = +0.2080
+Episode  2760: Correlation = +0.2078
+Episode  2770: Correlation = +0.2103
+Episode  2780: Correlation = +0.2124
+Episode  2790: Correlation = +0.2121
+Episode  2800: Correlation = +0.2130
+Episode  2810: Correlation = +0.2167
+Episode  2820: Correlation = +0.2174
+Episode  2830: Correlation = +0.2188
+Episode  2840: Correlation = +0.2206
+Episode  2850: Correlation = +0.2235
+Episode  2860: Correlation = +0.2260
+Episode  2870: Correlation = +0.2281
+Episode  2880: Correlation = +0.2302
+Episode  2890: Correlation = +0.2320
+Episode  2900: Correlation = +0.2314
+Episode  2910: Correlation = +0.2343
+Episode  2920: Correlation = +0.2359
+Episode  2930: Correlation = +0.2372
+Episode  2940: Correlation = +0.2337
+Episode  2950: Correlation = +0.2281
+Episode  2960: Correlation = +0.2265
+Episode  2970: Correlation = +0.2289
+Episode  2980: Correlation = +0.2343
+Episode  2990: Correlation = +0.2375
+Episode  3000: Correlation = +0.2392
+Episode  3010: Correlation = +0.2390
+Episode  3020: Correlation = +0.2389
+Episode  3030: Correlation = +0.2368
+Episode  3040: Correlation = +0.2362
+Episode  3050: Correlation = +0.2352
+Episode  3060: Correlation = +0.2329
+Episode  3070: Correlation = +0.2330
+Episode  3080: Correlation = +0.2326
+Episode  3090: Correlation = +0.2346
+Episode  3100: Correlation = +0.2391
+Episode  3110: Correlation = +0.2436
+Episode  3120: Correlation = +0.2475
+Episode  3130: Correlation = +0.2486
+Episode  3140: Correlation = +0.2491
+Episode  3150: Correlation = +0.2500
+Episode  3160: Correlation = +0.2521
+Episode  3170: Correlation = +0.2536
+Episode  3180: Correlation = +0.2558
+Episode  3190: Correlation = +0.2610
+Episode  3200: Correlation = +0.2625
+Episode  3210: Correlation = +0.2641
+Episode  3220: Correlation = +0.2665
+Episode  3230: Correlation = +0.2664
+Episode  3240: Correlation = +0.2676
+Episode  3250: Correlation = +0.2666
+Episode  3260: Correlation = +0.2671
+Episode  3270: Correlation = +0.2682
+Episode  3280: Correlation = +0.2714
+Episode  3290: Correlation = +0.2741
+Episode  3300: Correlation = +0.2761
+Episode  3310: Correlation = +0.2762
+Episode  3320: Correlation = +0.2743
+Episode  3330: Correlation = +0.2722
+Episode  3340: Correlation = +0.2730
+Episode  3350: Correlation = +0.2719
+Episode  3360: Correlation = +0.2708
+Episode  3370: Correlation = +0.2698
+Episode  3380: Correlation = +0.2654
+Episode  3390: Correlation = +0.2621
+Episode  3400: Correlation = +0.2615
+Episode  3410: Correlation = +0.2605
+Episode  3420: Correlation = +0.2624
+Episode  3430: Correlation = +0.2654
+Episode  3440: Correlation = +0.2655
+Episode  3450: Correlation = +0.2659
+Episode  3460: Correlation = +0.2666
+Episode  3470: Correlation = +0.2682
+Episode  3480: Correlation = +0.2704
+Episode  3490: Correlation = +0.2716
+Episode  3500: Correlation = +0.2755
+Episode  3510: Correlation = +0.2760
+Episode  3520: Correlation = +0.2782
+Episode  3530: Correlation = +0.2818
+Episode  3540: Correlation = +0.2855
+Episode  3550: Correlation = +0.2901
+Episode  3560: Correlation = +0.2913
+Episode  3570: Correlation = +0.2907
+Episode  3580: Correlation = +0.2918
+Episode  3590: Correlation = +0.2919
+Episode  3600: Correlation = +0.2925
+Episode  3610: Correlation = +0.2954
+Episode  3620: Correlation = +0.2966
+Episode  3630: Correlation = +0.2943
+Episode  3640: Correlation = +0.2962
+Episode  3650: Correlation = +0.2982
+Episode  3660: Correlation = +0.2977
+Episode  3670: Correlation = +0.2975
+Episode  3680: Correlation = +0.3001
+Episode  3690: Correlation = +0.3000
+Episode  3700: Correlation = +0.3005
+Episode  3710: Correlation = +0.2963
+Episode  3720: Correlation = +0.2973
+Episode  3730: Correlation = +0.3016
+Episode  3740: Correlation = +0.3045
+Episode  3750: Correlation = +0.3102
+Episode  3760: Correlation = +0.3139
+Episode  3770: Correlation = +0.3151
+Episode  3780: Correlation = +0.3157
+Episode  3790: Correlation = +0.3116
+Episode  3800: Correlation = +0.3080
+Episode  3810: Correlation = +0.3087
+Episode  3820: Correlation = +0.3115
+Episode  3830: Correlation = +0.3145
+Episode  3840: Correlation = +0.3173
+Episode  3850: Correlation = +0.3211
+Episode  3860: Correlation = +0.3252
+Episode  3870: Correlation = +0.3262
+Episode  3880: Correlation = +0.3268
+Episode  3890: Correlation = +0.3313
+Episode  3900: Correlation = +0.3359
+Episode  3910: Correlation = +0.3375
+Episode  3920: Correlation = +0.3406
+Episode  3930: Correlation = +0.3405
+Episode  3940: Correlation = +0.3391
+Episode  3950: Correlation = +0.3409
+Episode  3960: Correlation = +0.3412
+Episode  3970: Correlation = +0.3408
+Episode  3980: Correlation = +0.3414
+Episode  3990: Correlation = +0.3420
+Episode  4000: Correlation = +0.3414
+Episode  4010: Correlation = +0.3430
+Episode  4020: Correlation = +0.3462
+Episode  4030: Correlation = +0.3493
+Episode  4040: Correlation = +0.3499
+Episode  4050: Correlation = +0.3499
+Episode  4060: Correlation = +0.3469
+Episode  4070: Correlation = +0.3489
+Episode  4080: Correlation = +0.3529
+Episode  4090: Correlation = +0.3565
+Episode  4100: Correlation = +0.3580
+Episode  4110: Correlation = +0.3590
+Episode  4120: Correlation = +0.3562
+Episode  4130: Correlation = +0.3528
+Episode  4140: Correlation = +0.3456
+Episode  4150: Correlation = +0.3389
+Episode  4160: Correlation = +0.3414
+Episode  4170: Correlation = +0.3450
+Episode  4180: Correlation = +0.3490
+Episode  4190: Correlation = +0.3486
+Episode  4200: Correlation = +0.3481
+Episode  4210: Correlation = +0.3495
+Episode  4220: Correlation = +0.3478
+Episode  4230: Correlation = +0.3495
+Episode  4240: Correlation = +0.3501
+Episode  4250: Correlation = +0.3518
+Episode  4260: Correlation = +0.3548
+Episode  4270: Correlation = +0.3535
+Episode  4280: Correlation = +0.3541
+Episode  4290: Correlation = +0.3550
+Episode  4300: Correlation = +0.3608
+Episode  4310: Correlation = +0.3597
+Episode  4320: Correlation = +0.3608
+Episode  4330: Correlation = +0.3604
+Episode  4340: Correlation = +0.3613
+Episode  4350: Correlation = +0.3655
+Episode  4360: Correlation = +0.3669
+Episode  4370: Correlation = +0.3621
+Episode  4380: Correlation = +0.3606
+Episode  4390: Correlation = +0.3569
+Episode  4400: Correlation = +0.3569
+Episode  4410: Correlation = +0.3580
+Episode  4420: Correlation = +0.3605
+Episode  4430: Correlation = +0.3672
+Episode  4440: Correlation = +0.3764
+Episode  4450: Correlation = +0.3821
+Episode  4460: Correlation = +0.3819
+Episode  4470: Correlation = +0.3830
+Episode  4480: Correlation = +0.3826
+Episode  4490: Correlation = +0.3769
+Episode  4500: Correlation = +0.3720
+Episode  4510: Correlation = +0.3748
+Episode  4520: Correlation = +0.3796
+Episode  4530: Correlation = +0.3828
+Episode  4540: Correlation = +0.3838
+Episode  4550: Correlation = +0.3835
+Episode  4560: Correlation = +0.3806
+Episode  4570: Correlation = +0.3770
+Episode  4580: Correlation = +0.3763
+Episode  4590: Correlation = +0.3785
+Episode  4600: Correlation = +0.3867
+Episode  4610: Correlation = +0.3906
+Episode  4620: Correlation = +0.3957
+Episode  4630: Correlation = +0.3954
+Episode  4640: Correlation = +0.3874
+Episode  4650: Correlation = +0.3867
+Episode  4660: Correlation = +0.3883
+Episode  4670: Correlation = +0.3897
+Episode  4680: Correlation = +0.3922
+Episode  4690: Correlation = +0.3939
+Episode  4700: Correlation = +0.3934
+Episode  4710: Correlation = +0.3899
+Episode  4720: Correlation = +0.3878
+Episode  4730: Correlation = +0.3937
+Episode  4740: Correlation = +0.3964
+Episode  4750: Correlation = +0.3965
+Episode  4760: Correlation = +0.3989
+Episode  4770: Correlation = +0.4033
+Episode  4780: Correlation = +0.4083
+Episode  4790: Correlation = +0.4111
+Episode  4800: Correlation = +0.4100
+Episode  4810: Correlation = +0.4069
+Episode  4820: Correlation = +0.4007
+Episode  4830: Correlation = +0.3997
+Episode  4840: Correlation = +0.4004
+Episode  4850: Correlation = +0.4054
+Episode  4860: Correlation = +0.4125
+Episode  4870: Correlation = +0.4179
+Episode  4880: Correlation = +0.4207
+Episode  4890: Correlation = +0.4229
+Episode  4900: Correlation = +0.4222
+Episode  4910: Correlation = +0.4215
+Episode  4920: Correlation = +0.4217
+Episode  4930: Correlation = +0.4141
+Episode  4940: Correlation = +0.4100
+Episode  4950: Correlation = +0.4123
+Episode  4960: Correlation = +0.4115
+Episode  4970: Correlation = +0.4115
+Episode  4980: Correlation = +0.4120
+Episode  4990: Correlation = +0.4166
+Episode  5000: Correlation = +0.4207
+
+--------------------------------------------------------------------------------
+Top 10 States by Final Reward:
+--------------------------------------------------------------------------------
+
+ 1. Reward: 0.7939 | Flow: -7.2550
+    Actions: A(parent)→A(parent)→U(2,0)→U(5,1)→
+    State: grandparent(X2, X5) :- parent(X2, X3), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.64 → -9.49 → -8.06 → -7.94
+
+ 2. Reward: 0.7939 | Flow: -7.2550
+    Actions: A(parent)→U(0,2)→A(parent)→U(5,1)→
+    State: grandparent(X0, X5) :- parent(X0, X3), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.64 → -9.49 → -8.06 → -7.94
+
+ 3. Reward: 0.7939 | Flow: -7.2550
+    Actions: A(parent)→U(1,3)→A(parent)→U(4,0)→
+    State: grandparent(X4, X1) :- parent(X2, X1), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.64 → -9.49 → -8.06 → -7.94
+
+ 4. Reward: 0.3524 | Flow: -7.3887
+    Actions: A(parent)→A(parent)→U(5,1)→U(0,3)→
+    State: grandparent(X0, X5) :- parent(X2, X0), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.71 → -9.54 → -8.16 → -7.98
+
+ 5. Reward: 0.3524 | Flow: -7.3887
+    Actions: A(parent)→A(parent)→U(5,0)→U(1,3)→
+    State: grandparent(X5, X1) :- parent(X2, X1), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.71 → -9.54 → -8.16 → -7.98
+
+ 6. Reward: 0.2667 | Flow: -8.7464
+    Actions: A(parent)→A(parent)→U(2,1)→U(4,0)→
+    State: grandparent(X4, X2) :- parent(X2, X3), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.57 → -9.46 → -8.14 → -8.62
+
+ 7. Reward: 0.2667 | Flow: -8.7464
+    Actions: A(parent)→A(parent)→U(2,0)→U(4,1)→
+    State: grandparent(X2, X4) :- parent(X2, X3), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.57 → -9.46 → -8.14 → -8.62
+
+ 8. Reward: 0.2667 | Flow: -8.7464
+    Actions: A(parent)→U(0,2)→A(parent)→U(4,1)→
+    State: grandparent(X0, X4) :- parent(X0, X3), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.57 → -9.46 → -8.14 → -8.62
+
+ 9. Reward: 0.2667 | Flow: -8.7464
+    Actions: A(parent)→U(1,2)→A(parent)→U(4,0)→
+    State: grandparent(X4, X1) :- parent(X1, X3), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.57 → -9.46 → -8.14 → -8.62
+
+10. Reward: 0.0667 | Flow: -8.8958
+    Actions: A(parent)→A(parent)→U(2,1)→U(5,0)→
+    State: grandparent(X5, X2) :- parent(X2, X3), parent(X4, X5).
+    Flow trajectory: -0.14 → -8.64 → -9.51 → -8.23 → -8.70
+
+--------------------------------------------------------------------------------
+Bottom 5 States by Final Reward:
+--------------------------------------------------------------------------------
+
+1. Reward: 0.0000 | Flow: -9.1878
+   State: grandparent(X0, X1) :- parent(X1, X5), parent(X4, X5).
+
+2. Reward: 0.0000 | Flow: -9.9152
+   State: grandparent(X0, X4) :- parent(X4, X3), parent(X4, X5).
+
+3. Reward: 0.0000 | Flow: -9.1593
+   State: grandparent(X0, X1) :- parent(X1, X4), parent(X4, X5).
+
+4. Reward: 0.0000 | Flow: -10.9640
+   State: grandparent(X0, X1) :- parent(X1, X1), parent(X4, X5).
+
+5. Reward: 0.0000 | Flow: -8.6006
+   State: grandparent(X0, X1) :- parent(X2, X1), parent(X4, X5), parent(X6, X7).
+
+--------------------------------------------------------------------------------
+Final Statistics:
+--------------------------------------------------------------------------------
+Flow statistics:
+  Mean: -9.3183
+  Std:  1.0248
+  Min:  -12.9847
+  Max:  -7.2550
+
+Reward statistics:
+  Mean: 0.0379
+  Std:  0.1406
+  Min:  0.0000
+  Max:  0.7939
+
+================================================================================

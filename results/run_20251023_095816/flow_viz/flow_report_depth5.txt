@@ -1,0 +1,253 @@
+================================================================================
+FLOW PREDICTION ANALYSIS REPORT
+================================================================================
+
+Configuration:
+  Target predicate: grandparent
+  Depth from origin: 5
+  States analyzed: 312
+  Episodes tracked: 150
+
+--------------------------------------------------------------------------------
+Flow-Reward Correlation Evolution:
+--------------------------------------------------------------------------------
+Episode   100: Correlation = -0.0735
+Episode   200: Correlation = -0.1635
+Episode   300: Correlation = -0.1454
+Episode   400: Correlation = -0.1383
+Episode   500: Correlation = -0.1655
+Episode   600: Correlation = -0.1711
+Episode   700: Correlation = -0.1743
+Episode   800: Correlation = -0.1830
+Episode   900: Correlation = -0.1923
+Episode  1000: Correlation = -0.1966
+Episode  1100: Correlation = -0.1973
+Episode  1200: Correlation = -0.2023
+Episode  1300: Correlation = -0.1994
+Episode  1400: Correlation = -0.1941
+Episode  1500: Correlation = -0.1967
+Episode  1600: Correlation = -0.2063
+Episode  1700: Correlation = -0.2078
+Episode  1800: Correlation = -0.2093
+Episode  1900: Correlation = -0.2019
+Episode  2000: Correlation = -0.1968
+Episode  2100: Correlation = -0.2112
+Episode  2200: Correlation = -0.2028
+Episode  2300: Correlation = -0.2172
+Episode  2400: Correlation = -0.1994
+Episode  2500: Correlation = -0.1849
+Episode  2600: Correlation = -0.1816
+Episode  2700: Correlation = -0.1767
+Episode  2800: Correlation = -0.1788
+Episode  2900: Correlation = -0.1638
+Episode  3000: Correlation = -0.1601
+Episode  3100: Correlation = -0.1581
+Episode  3200: Correlation = -0.1586
+Episode  3300: Correlation = -0.1542
+Episode  3400: Correlation = -0.1502
+Episode  3500: Correlation = -0.1446
+Episode  3600: Correlation = -0.1407
+Episode  3700: Correlation = -0.1349
+Episode  3800: Correlation = -0.1301
+Episode  3900: Correlation = -0.1262
+Episode  4000: Correlation = -0.1237
+Episode  4100: Correlation = -0.1210
+Episode  4200: Correlation = -0.1162
+Episode  4300: Correlation = -0.1131
+Episode  4400: Correlation = -0.1119
+Episode  4500: Correlation = -0.1107
+Episode  4600: Correlation = -0.1027
+Episode  4700: Correlation = -0.0987
+Episode  4800: Correlation = -0.0966
+Episode  4900: Correlation = -0.0889
+Episode  5000: Correlation = -0.0808
+Episode  5100: Correlation = -0.0724
+Episode  5200: Correlation = -0.0697
+Episode  5300: Correlation = -0.0636
+Episode  5400: Correlation = -0.0587
+Episode  5500: Correlation = -0.0524
+Episode  5600: Correlation = -0.0532
+Episode  5700: Correlation = -0.0482
+Episode  5800: Correlation = -0.0429
+Episode  5900: Correlation = -0.0405
+Episode  6000: Correlation = -0.0355
+Episode  6100: Correlation = -0.0286
+Episode  6200: Correlation = -0.0186
+Episode  6300: Correlation = -0.0073
+Episode  6400: Correlation = +0.0041
+Episode  6500: Correlation = +0.0123
+Episode  6600: Correlation = +0.0088
+Episode  6700: Correlation = +0.0244
+Episode  6800: Correlation = +0.0290
+Episode  6900: Correlation = +0.0427
+Episode  7000: Correlation = +0.0452
+Episode  7100: Correlation = +0.0534
+Episode  7200: Correlation = +0.0665
+Episode  7300: Correlation = +0.0766
+Episode  7400: Correlation = +0.0954
+Episode  7500: Correlation = +0.0955
+Episode  7600: Correlation = +0.0992
+Episode  7700: Correlation = +0.1237
+Episode  7800: Correlation = +0.1181
+Episode  7900: Correlation = +0.1130
+Episode  8000: Correlation = +0.1565
+Episode  8100: Correlation = +0.1144
+Episode  8200: Correlation = +0.1150
+Episode  8300: Correlation = +0.1412
+Episode  8400: Correlation = +0.1439
+Episode  8500: Correlation = +0.1628
+Episode  8600: Correlation = +0.1538
+Episode  8700: Correlation = +0.1730
+Episode  8800: Correlation = +0.1767
+Episode  8900: Correlation = +0.1701
+Episode  9000: Correlation = +0.1471
+Episode  9100: Correlation = +0.1448
+Episode  9200: Correlation = +0.1826
+Episode  9300: Correlation = +0.1907
+Episode  9400: Correlation = +0.1860
+Episode  9500: Correlation = +0.1399
+Episode  9600: Correlation = +0.1770
+Episode  9700: Correlation = +0.1738
+Episode  9800: Correlation = +0.1676
+Episode  9900: Correlation = +0.1938
+Episode 10000: Correlation = +0.1903
+Episode 10100: Correlation = +0.1984
+Episode 10200: Correlation = +0.2185
+Episode 10300: Correlation = +0.2065
+Episode 10400: Correlation = +0.2102
+Episode 10500: Correlation = +0.1781
+Episode 10600: Correlation = +0.2071
+Episode 10700: Correlation = +0.2401
+Episode 10800: Correlation = +0.2194
+Episode 10900: Correlation = +0.2371
+Episode 11000: Correlation = +0.2220
+Episode 11100: Correlation = +0.2241
+Episode 11200: Correlation = +0.1991
+Episode 11300: Correlation = +0.2207
+Episode 11400: Correlation = +0.2309
+Episode 11500: Correlation = +0.2607
+Episode 11600: Correlation = +0.2539
+Episode 11700: Correlation = +0.2701
+Episode 11800: Correlation = +0.2756
+Episode 11900: Correlation = +0.2855
+Episode 12000: Correlation = +0.2955
+Episode 12100: Correlation = +0.2938
+Episode 12200: Correlation = +0.2897
+Episode 12300: Correlation = +0.3042
+Episode 12400: Correlation = +0.3200
+Episode 12500: Correlation = +0.2792
+Episode 12600: Correlation = +0.3242
+Episode 12700: Correlation = +0.3200
+Episode 12800: Correlation = +0.3249
+Episode 12900: Correlation = +0.3337
+Episode 13000: Correlation = +0.3379
+Episode 13100: Correlation = +0.3302
+Episode 13200: Correlation = +0.3359
+Episode 13300: Correlation = +0.3315
+Episode 13400: Correlation = +0.3159
+Episode 13500: Correlation = +0.3310
+Episode 13600: Correlation = +0.3266
+Episode 13700: Correlation = +0.3033
+Episode 13800: Correlation = +0.3142
+Episode 13900: Correlation = +0.2931
+Episode 14000: Correlation = +0.3013
+Episode 14100: Correlation = +0.3061
+Episode 14200: Correlation = +0.3435
+Episode 14300: Correlation = +0.3436
+Episode 14400: Correlation = +0.3268
+Episode 14500: Correlation = +0.3148
+Episode 14600: Correlation = +0.3337
+Episode 14700: Correlation = +0.3510
+Episode 14800: Correlation = +0.3610
+Episode 14900: Correlation = +0.3635
+Episode 15000: Correlation = +0.3522
+
+--------------------------------------------------------------------------------
+Top 10 States by Final Reward:
+--------------------------------------------------------------------------------
+
+ 1. Reward: 11.3333 | Flow: -11.7605
+    Actions: A(parent)→A(parent)→U(2,5)→U(4,0)→U(1,3)→
+    State: grandparent(X4, X1) :- parent(X2, X1), parent(X4, X2).
+    Flow trajectory: -0.16 → -12.49 → -11.00 → -11.69 → -11.50
+
+ 2. Reward: 11.3333 | Flow: -11.7605
+    Actions: A(parent)→A(parent)→U(2,5)→U(1,3)→U(0,4)→
+    State: grandparent(X0, X1) :- parent(X2, X1), parent(X0, X2).
+    Flow trajectory: -0.16 → -12.49 → -11.00 → -11.69 → -11.50
+
+ 3. Reward: 11.3333 | Flow: -11.7605
+    Actions: A(parent)→A(parent)→U(2,0)→U(5,1)→U(3,4)→
+    State: grandparent(X2, X5) :- parent(X2, X3), parent(X3, X5).
+    Flow trajectory: -0.16 → -12.49 → -11.00 → -11.69 → -11.50
+
+ 4. Reward: 11.3333 | Flow: -11.7605
+    Actions: A(parent)→A(parent)→U(2,0)→U(4,3)→U(1,5)→
+    State: grandparent(X2, X1) :- parent(X2, X4), parent(X4, X1).
+    Flow trajectory: -0.16 → -12.49 → -11.00 → -11.69 → -11.50
+
+ 5. Reward: 11.3333 | Flow: -11.7605
+    Actions: A(parent)→A(parent)→U(5,1)→U(4,3)→U(0,2)→
+    State: grandparent(X0, X5) :- parent(X0, X4), parent(X4, X5).
+    Flow trajectory: -0.16 → -12.49 → -11.00 → -11.69 → -11.50
+
+ 6. Reward: 4.2727 | Flow: -9.4242
+    Actions: A(parent)→A(parent)→U(2,0)→U(5,1)→A(parent)→
+    State: grandparent(X2, X5) :- parent(X2, X3), parent(X4, X5), parent(X6, X7).
+    Flow trajectory: -0.16 → -11.35 → -9.59 → -9.50 → -9.04
+
+ 7. Reward: 4.2727 | Flow: -9.4242
+    Actions: A(parent)→A(parent)→U(5,1)→A(parent)→U(6,0)→
+    State: grandparent(X6, X5) :- parent(X2, X3), parent(X4, X5), parent(X6, X7).
+    Flow trajectory: -0.16 → -11.35 → -9.59 → -9.50 → -9.04
+
+ 8. Reward: 1.3333 | Flow: -13.2190
+    Actions: A(parent)→A(parent)→U(2,5)→U(2,1)→U(0,3)→
+    State: grandparent(X0, X2) :- parent(X2, X0), parent(X4, X2).
+    Flow trajectory: -0.16 → -12.57 → -11.27 → -12.79 → -13.01
+
+ 9. Reward: 1.3333 | Flow: -13.3671
+    Actions: A(parent)→A(parent)→U(2,5)→U(2,1)→U(0,4)→
+    State: grandparent(X0, X2) :- parent(X2, X3), parent(X0, X2).
+    Flow trajectory: -0.16 → -12.60 → -11.26 → -12.85 → -13.13
+
+10. Reward: 1.3333 | Flow: -13.1756
+    Actions: A(parent)→A(parent)→U(2,5)→U(2,0)→U(1,3)→
+    State: grandparent(X2, X1) :- parent(X2, X1), parent(X4, X2).
+    Flow trajectory: -0.16 → -12.58 → -11.28 → -12.79 → -13.00
+
+--------------------------------------------------------------------------------
+Bottom 5 States by Final Reward:
+--------------------------------------------------------------------------------
+
+1. Reward: 0.0000 | Flow: -13.2333
+   State: grandparent(X0, X6) :- parent(X2, X5), parent(X4, X5), parent(X6, X7).
+
+2. Reward: 0.0000 | Flow: -13.3825
+   State: grandparent(X0, X1) :- parent(X2, X5), parent(X4, X5), parent(X6, X6).
+
+3. Reward: 0.0000 | Flow: -13.2326
+   State: grandparent(X6, X1) :- parent(X2, X5), parent(X4, X5), parent(X6, X7).
+
+4. Reward: 0.0000 | Flow: -13.3283
+   State: grandparent(X0, X1) :- parent(X2, X5), parent(X4, X5), parent(X6, X2).
+
+5. Reward: 0.0000 | Flow: -13.2852
+   State: grandparent(X0, X4) :- parent(X2, X5), parent(X4, X5), parent(X6, X7).
+
+--------------------------------------------------------------------------------
+Final Statistics:
+--------------------------------------------------------------------------------
+Flow statistics:
+  Mean: -13.2059
+  Std:  0.8300
+  Min:  -14.2495
+  Max:  -9.4049
+
+Reward statistics:
+  Mean: 0.4355
+  Std:  1.5125
+  Min:  0.0000
+  Max:  11.3333
+
+================================================================================

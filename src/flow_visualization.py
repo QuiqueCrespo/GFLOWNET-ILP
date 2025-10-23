@@ -208,13 +208,21 @@ class FlowVisualizer:
         # ============= Plot 1: Flow evolution for top states =============
         ax1 = fig.add_subplot(gs[0, :2])
 
+        # Define unique styles for top 5 states
+        COLORS_TOP = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+        MARKERS_TOP = ['o', 's', '^', 'v', 'D']
+
         for i, state_str in enumerate(top_10_states[:5]):
             flows = [snap['flows'][state_str] for snap in self.episode_snapshots]
             reward = final_rewards[state_str]
 
             # Abbreviate state string for legend
             state_abbrev = state_str[:40] + "..." if len(state_str) > 40 else state_str
-            ax1.plot(episodes, flows, marker='o', label=f"R={reward:.3f}: {state_abbrev}",
+            ax1.plot(episodes, flows,
+                    color=COLORS_TOP[i],
+                    marker=MARKERS_TOP[i],
+                    linestyle='-',
+                    label=f"R={reward:.3f}: {state_abbrev}",
                     linewidth=2, markersize=4)
 
         ax1.set_xlabel('Episode', fontsize=12)
@@ -226,13 +234,22 @@ class FlowVisualizer:
         # ============= Plot 2: Flow evolution for bottom states =============
         ax2 = fig.add_subplot(gs[0, 2])
 
+        # Define unique styles for bottom 3 states
+        COLORS_BOTTOM = ['#d62728', '#8c564b', '#e377c2']
+        MARKERS_BOTTOM = ['x', '+', '*']
+        LINESTYLES_BOTTOM = ['--', '-.', ':']
+
         for i, state_str in enumerate(bottom_5_states[:3]):
             flows = [snap['flows'][state_str] for snap in self.episode_snapshots]
             reward = final_rewards[state_str]
 
             state_abbrev = state_str[:30] + "..." if len(state_str) > 30 else state_str
-            ax2.plot(episodes, flows, marker='x', label=f"R={reward:.3f}",
-                    linewidth=2, markersize=4, linestyle='--')
+            ax2.plot(episodes, flows,
+                    color=COLORS_BOTTOM[i],
+                    marker=MARKERS_BOTTOM[i],
+                    linestyle=LINESTYLES_BOTTOM[i],
+                    label=f"R={reward:.3f}",
+                    linewidth=2, markersize=4)
 
         ax2.set_xlabel('Episode', fontsize=12)
         ax2.set_ylabel('Predicted log F(s)', fontsize=12)
@@ -416,6 +433,12 @@ class FlowVisualizer:
 
         fig, ax = plt.subplots(figsize=(14, 8))
 
+        # Define unique styles for up to 10 state trajectories
+        COLORS_TRAJ = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+                       '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        MARKERS_TRAJ = ['o', 's', '^', 'v', 'D', 'p', '*', 'h', 'x', '+']
+        LINESTYLES_TRAJ = ['-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--']
+
         for i, state_str in enumerate(top_states):
             flows = [snap['flows'][state_str] for snap in self.episode_snapshots]
             reward = final_rewards[state_str]
@@ -432,7 +455,16 @@ class FlowVisualizer:
             if action_seq:
                 label += f" | {action_seq[:30]}"
 
-            ax.plot(episodes, flows, marker='o', label=label,
+            # Get unique style for this line
+            color_idx = i % len(COLORS_TRAJ)
+            marker_idx = i % len(MARKERS_TRAJ)
+            linestyle_idx = i % len(LINESTYLES_TRAJ)
+
+            ax.plot(episodes, flows,
+                   color=COLORS_TRAJ[color_idx],
+                   marker=MARKERS_TRAJ[marker_idx],
+                   linestyle=LINESTYLES_TRAJ[linestyle_idx],
+                   label=label,
                    linewidth=2, markersize=5, alpha=0.8)
 
         ax.set_xlabel('Episode', fontsize=12)
